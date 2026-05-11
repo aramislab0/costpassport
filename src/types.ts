@@ -53,11 +53,11 @@ export interface Scenario {
 export interface CostReadinessScore {
   score: number;
   status: string;
-  riskLevel: "Low" | "Medium" | "High";
+  riskLevel: "Low" | "Low-medium" | "Medium" | "Medium-high" | "High";
   optimizationPotential: number;
 }
 
-export type TokenBloatRisk = "Low" | "Medium" | "High" | "Critical";
+export type TokenBloatRisk = "Low" | "Low-medium" | "Medium" | "Medium-high" | "High" | "Critical";
 
 export interface ContextDiet {
   remove: string[];

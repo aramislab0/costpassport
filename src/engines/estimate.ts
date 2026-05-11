@@ -18,7 +18,7 @@ import pricingRaw from "../resources/pricing.anthropic.json" with { type: "json"
 import fxRaw from "../resources/fx.json" with { type: "json" };
 import tiersRaw from "../resources/complexity-tiers.json" with { type: "json" };
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 const PRICING = pricingRaw as unknown as PricingTable;
 const FX = fxRaw as unknown as FxTable;

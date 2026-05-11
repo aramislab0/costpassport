@@ -11,7 +11,7 @@ import type {
   TokenDoctorReport,
 } from "../types.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 // ─── Token leaks ──────────────────────────────────────────────────────────────
 
@@ -93,17 +93,44 @@ function detectProjectLeaks(signals: ProjectSignals): string[] {
 
 // ─── Token Bloat Risk ─────────────────────────────────────────────────────────
 
-function computeBloatRisk(leakCount: number, signals: ProjectSignals | null): TokenBloatRisk {
-  let score = leakCount;
+/** Maps costReadinessScore.score → TokenBloatRisk using the canonical 5-tier scale. */
+function scoreToTokenBloatRisk(score: number): TokenBloatRisk {
+  if (score >= 85) return "Low";
+  if (score >= 70) return "Low-medium";
+  if (score >= 50) return "Medium";
+  if (score >= 30) return "Medium-high";
+  return "High";
+}
+
+const RISK_RANK: Record<TokenBloatRisk, number> = {
+  "Low": 0, "Low-medium": 1, "Medium": 2, "Medium-high": 3, "High": 4, "Critical": 5,
+};
+
+/** Leak-count heuristic — bumps risk up when leaks are high, never lowers it. */
+function computeLeakRisk(leakCount: number, signals: ProjectSignals | null): TokenBloatRisk {
+  let n = leakCount;
   if (signals !== null) {
-    if (signals.claudeMdLines > 80) score++;
-    if (signals.hasLargeLogs) score++;
-    if (!signals.hasClaudeMd) score++;
+    if (signals.claudeMdLines > 80) n++;
+    if (signals.hasLargeLogs) n++;
+    if (!signals.hasClaudeMd) n++;
   }
-  if (score >= 7) return "Critical";
-  if (score >= 4) return "High";
-  if (score >= 2) return "Medium";
+  if (n >= 7) return "Critical";
+  if (n >= 6) return "High";
+  if (n >= 4) return "Medium-high";
+  if (n >= 2) return "Medium";
+  if (n >= 1) return "Low-medium";
   return "Low";
+}
+
+/** Final tokenBloatRisk = worst of score-based risk and leak-based risk. */
+function computeBloatRisk(
+  costScore: number,
+  leakCount: number,
+  signals: ProjectSignals | null
+): TokenBloatRisk {
+  const scoreRisk = scoreToTokenBloatRisk(costScore);
+  const leakRisk = computeLeakRisk(leakCount, signals);
+  return RISK_RANK[scoreRisk] >= RISK_RANK[leakRisk] ? scoreRisk : leakRisk;
 }
 
 // ─── Context Diet ─────────────────────────────────────────────────────────────
@@ -190,7 +217,7 @@ function buildOptimizationPlan(flags: BriefFlags, signals: ProjectSignals | null
   if (flags.mobile)
     structural.push("Separate mobile app planning from web — different complexity, different token budget");
   structural.push("Use --brief to pass scoped context instead of piping full README to the agent");
-  if (risk === "High" || risk === "Critical")
+  if (risk === "High" || risk === "Medium-high" || risk === "Critical")
     structural.push("Run `costpassport before-you-build` before starting to identify the riskiest areas");
 
   // Advanced
@@ -208,19 +235,23 @@ function buildOptimizationPlan(flags: BriefFlags, signals: ProjectSignals | null
 
 function estimateSavings(risk: TokenBloatRisk): { minPercent: number; maxPercent: number } {
   switch (risk) {
-    case "Low":      return { minPercent: 10, maxPercent: 20 };
-    case "Medium":   return { minPercent: 25, maxPercent: 40 };
-    case "High":     return { minPercent: 40, maxPercent: 55 };
-    case "Critical": return { minPercent: 50, maxPercent: 70 };
+    case "Low":        return { minPercent: 10, maxPercent: 20 };
+    case "Low-medium": return { minPercent: 15, maxPercent: 25 };
+    case "Medium":     return { minPercent: 25, maxPercent: 40 };
+    case "Medium-high":return { minPercent: 35, maxPercent: 50 };
+    case "High":       return { minPercent: 40, maxPercent: 55 };
+    case "Critical":   return { minPercent: 50, maxPercent: 70 };
   }
 }
 
 function recommendedAction(risk: TokenBloatRisk): string {
   switch (risk) {
-    case "Low":      return "Safe to continue. Enable prompt caching to further reduce costs.";
-    case "Medium":   return "Compress project context before using Claude Code.";
-    case "High":     return "Split the build into smaller lots and clarify scope before starting.";
-    case "Critical": return "Clarify MVP scope before starting. Do not launch a full build yet.";
+    case "Low":        return "Ready to build. Keep the context lean and track costs.";
+    case "Low-medium": return "Safe to continue, but apply the recommended optimizations.";
+    case "Medium":     return "You can start with caution. Split the build into clear phases.";
+    case "Medium-high":return "Clarify the brief and reduce context before starting.";
+    case "High":       return "Do not start yet. Clarify scope, context strategy and build phases first.";
+    case "Critical":   return "Clarify MVP scope before starting. Do not launch a full build yet.";
   }
 }
 
@@ -263,7 +294,8 @@ export function tokenDoctor({
   const projectLeaks = signals ? detectProjectLeaks(signals) : [];
   const mainTokenLeaks = [...briefLeaks, ...projectLeaks].slice(0, 8);
 
-  const tokenBloatRisk = computeBloatRisk(mainTokenLeaks.length, signals);
+  // tokenBloatRisk = worst of score-based risk and leak-count-based risk
+  const tokenBloatRisk = computeBloatRisk(costReadinessScore.score, mainTokenLeaks.length, signals);
 
   return {
     tokenBloatRisk,

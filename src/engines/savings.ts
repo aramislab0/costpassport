@@ -12,7 +12,7 @@ import type {
 import fxRaw from "../resources/fx.json" with { type: "json" };
 import type { FxTable } from "../types.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 const FX = fxRaw as unknown as FxTable;
 
 // ─── Savings % from score ─────────────────────────────────────────────────────
@@ -20,9 +20,10 @@ const FX = fxRaw as unknown as FxTable;
 function savingsPercent(estimate: Estimate, signals: ProjectSignals | null): { min: number; max: number } {
   const score = estimate.costReadinessScore.score;
   let base: { min: number; max: number };
-  if (score >= 75) base = { min: 10, max: 20 };
-  else if (score >= 60) base = { min: 20, max: 35 };
-  else if (score >= 45) base = { min: 30, max: 45 };
+  if (score >= 85) base = { min: 10, max: 20 };
+  else if (score >= 70) base = { min: 15, max: 25 };
+  else if (score >= 50) base = { min: 25, max: 40 };
+  else if (score >= 30) base = { min: 35, max: 50 };
   else base = { min: 40, max: 60 };
 
   // project signals can push the range up
@@ -104,12 +105,12 @@ function buildPriorityActions(levers: SavingsLever[]): { highImpact: string[]; m
 
 // ─── Recommended action ───────────────────────────────────────────────────────
 
-function recommendedAction(score: number, minPercent: number): string {
-  if (score >= 75 && minPercent <= 15)
-    return "Safe to continue with Standard scenario, but enable prompt caching to reduce costs further.";
-  if (score >= 55)
-    return "Compress context and split the build into smaller lots before using Claude Code.";
-  return "Clarify MVP scope before starting. This is the highest-impact saving available.";
+function recommendedAction(score: number): string {
+  if (score >= 85) return "Ready to build. Keep the context lean and track costs.";
+  if (score >= 70) return "Safe to continue, but apply the recommended optimizations.";
+  if (score >= 50) return "You can start with caution. Split the build into clear phases.";
+  if (score >= 30) return "Clarify the brief and reduce context before starting.";
+  return "Do not start yet. Clarify scope, context strategy and build phases first.";
 }
 
 // ─── Main engine ──────────────────────────────────────────────────────────────
@@ -172,7 +173,7 @@ export function savingsReport({
       "These estimates cover AI token cost only — not developer time, hosting, or third-party services. " +
       "For agencies and freelancers, add a 20–30% overhead buffer on top of the token budget to account for rework, clarification loops, and unexpected complexity. " +
       "The tighter and more explicit your brief, the smaller the buffer needed.",
-    recommendedNextAction: recommendedAction(score, minSavings),
+    recommendedNextAction: recommendedAction(score),
     assumptions: [
       "Current cost baseline: Standard scenario (Sonnet 4.6, 65% input / 35% output ratio)",
       "Optimized cost assumes all listed levers are applied",

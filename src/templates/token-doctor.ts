@@ -1,10 +1,12 @@
 import type { ContextDiet, OptimizationPlan, TokenBloatRisk, TokenDoctorReport } from "../types.js";
 
 const RISK_LABEL: Record<TokenBloatRisk, string> = {
-  Low: "LOW",
-  Medium: "MEDIUM",
-  High: "HIGH",
-  Critical: "CRITICAL",
+  "Low": "LOW",
+  "Low-medium": "LOW-MEDIUM",
+  "Medium": "MEDIUM",
+  "Medium-high": "MEDIUM-HIGH",
+  "High": "HIGH",
+  "Critical": "CRITICAL",
 };
 
 function fmtSection(label: string, items: string[]): string[] {
@@ -81,10 +83,12 @@ export function renderTokenDoctor(report: TokenDoctorReport): string {
   lines.push(`**${RISK_LABEL[report.tokenBloatRisk]}**`);
   lines.push("");
   const riskDesc: Record<TokenBloatRisk, string> = {
-    Low: "Project context is lean and well-structured. Minimal rework risk.",
-    Medium: "Some ambiguity detected. Expect iteration overhead if not addressed.",
-    High: "Significant token waste likely. Address the leaks below before starting.",
-    Critical: "Very high bloat risk. Starting now will cost 2–3× the optimal budget.",
+    "Low": "Project context is lean and well-structured. Minimal rework risk.",
+    "Low-medium": "Context is mostly clear. Apply the optimizations below to reduce overhead.",
+    "Medium": "Some ambiguity detected. Expect iteration overhead if not addressed before build.",
+    "Medium-high": "Notable gaps in brief or project context. Clarify before starting.",
+    "High": "Significant token waste likely. Do not start a full build before addressing the leaks below.",
+    "Critical": "Very high bloat risk. Starting now will cost 2–3× the optimal budget.",
   };
   lines.push(riskDesc[report.tokenBloatRisk]);
   lines.push("");

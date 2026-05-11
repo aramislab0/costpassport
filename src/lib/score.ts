@@ -15,13 +15,18 @@ export function computeScore(
   const score = Math.max(0, Math.min(100, base + tierAdj - missingPenalty));
 
   const status =
-    score >= 75 ? "Excellent" :
-    score >= 60 ? "Good, but expensive" :
-    score >= 45 ? "Needs attention" :
+    score >= 85 ? "Excellent" :
+    score >= 70 ? "Good" :
+    score >= 50 ? "Acceptable" :
+    score >= 30 ? "Needs work" :
     "High risk";
 
-  const riskLevel: "Low" | "Medium" | "High" =
-    score >= 70 ? "Low" : score >= 45 ? "Medium" : "High";
+  const riskLevel: "Low" | "Low-medium" | "Medium" | "Medium-high" | "High" =
+    score >= 85 ? "Low" :
+    score >= 70 ? "Low-medium" :
+    score >= 50 ? "Medium" :
+    score >= 30 ? "Medium-high" :
+    "High";
 
   const optimizationPotential = Math.min(60,
     25 +
