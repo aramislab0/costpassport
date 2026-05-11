@@ -59,10 +59,18 @@
 - [x] npx estimate --brief marketplace.md --live --sources — data_origin: live_fetch ✅
 - [x] npx savings-report --brief marketplace.md --live --sources — EUR 18.36–48.96, savings 15–25% ✅
 
+### v0.3.x patch — Tests ✅ (post-publish, no version bump)
+- Vitest installed as dev dependency (v4.1.6). D-027.
+- `tests/core.test.ts` — 42 tests, 207ms, 0 failures.
+- Coverage: FX chain, scoring 5-tier, readiness decisions, resolver fallback, ECB failure
+- `npm test` script added. `npm test:watch` for dev loop.
+- tsconfig.json updated to include `tests/**/*`.
+- `vitest.config.ts` created.
+
 ## Next — v0.4.0
-- Automated test suite (vitest) — regression coverage on scoring, currency chain, --live fallback
 - OpenAI / Gemini provider support (provider abstraction)
 - `--provider` flag on estimate
+- Claude Code plugin (MCP wrapper, command palette integration)
 
 ## Risks
 - Anthropic pricing table: hardcoded in pricing-update.ts — must be updated manually when prices change

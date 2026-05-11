@@ -31,12 +31,16 @@
 - Fix: `before-you-build` "Ready to build" threshold aligned to score ≥ 85
 - Architecture: CostPassport remains local-first, no server required
 
-## v0.3.0 — Mode --live + FX sérieux
+## v0.3.0 — Mode --live + FX sérieux ✅ Published
 - Flag `--live` on estimate, token-doctor, savings-report
-- Fetches fresh data before calculation when online
-- Graceful fallback to cache if fetch fails
-- ECB reference rates as default source for USD/EUR
-- Flag `--sources` shows live fetch results
+- Fetches ECB FX before calculation — reuses pricing:update engine
+- Graceful fallback to cache/bundled if ECB unreachable
+- `--sources` shows `data_origin: live_fetch` with fresh FX rates
+
+## v0.3.x — Core test suite ✅ (post-publish patch, no version bump)
+- Vitest test suite: 42 tests, 207ms, 5 critical areas covered
+- FX chain, scoring coherence, readiness decisions, resolver fallback, ECB failure
+- Safe for CI: fs mocked, no real cache touched, no network calls
 
 ## v0.4.0 — Plugin Claude Code
 - Skill `/costpassport:preflight` — analyzes brief before build, checks budget, lists risks

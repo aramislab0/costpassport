@@ -1,5 +1,18 @@
 # Architecture Decisions
 
+## D-027 · Add automated core tests before plugin work — 2026-05-11
+First automated test suite (vitest) covering the 5 critical risk areas:
+  1. FX conversion chain — USD → EUR → XOF, peg 655.957, rounding at each step
+  2. Scoring 5-tier coherence — computeScore() mapping + invariant checks (score 15 ≠ "Safe", score 75 ≠ "Excellent")
+  3. Readiness decision logic — "Ready to build" reserved for score >= 85, "Almost ready" for 70–84
+  4. Resolver fallback — absent / corrupted / wrong-format cache all fall back to bundled; valid CacheV1 resolves to "cache"
+  5. --live ECB failure — graceful fallback, fxLive=false, warning present, no crash on HTTP 503 or malformed XML
+Method: vi.spyOn(fs, 'existsSync/readFileSync') for resolver — no real cache touched.
+Method: vi.stubGlobal('fetch') for ECB tests — zero real network calls.
+42 tests, 207ms, 1 file (tests/core.test.ts).
+Rationale: CostPassport now has live data, local cache, FX conversions and product scoring.
+Tests protect the core before the plugin (Claude Code) and provider abstraction work.
+
 ## D-026 · --live flag fetches ECB FX inline before calculation — 2026-05-11
 New opt-in flag --live added to estimate, savings-report, and token-doctor.
 Without --live: behaviour unchanged (reads cache if available, falls back to bundled JSON).
