@@ -1,45 +1,42 @@
 # CostPassport — Project State
-**Phase:** v0.1.1 — Ready to publish (pending npm OTP)
+**Phase:** v0.2.0 — Feature complete, pending commit + tag
 **Last update:** 2026-05-11
 **Version local:** 0.1.1
-**Version npm:** 0.1.0 (0.1.1 publish blocked on user OTP)
+**Version npm:** 0.1.1 ✅
 
 ## Done
+
+### v0.1.x
 - v0.1.0: Full MVP — estimate, before-you-build, token-doctor, savings-report ✅
 - v0.1.0: npm published, npx costpassport works ✅
-- v0.1.1: Scoring coherence fix ✅
-  - tokenBloatRisk derived from score via scoreToTokenBloatRisk() + max(scoreRisk, leakRisk)
-  - 5-tier mapping: Low / Low-medium / Medium / Medium-high / High + Critical for 7+ leaks
-  - score 15 → tokenBloatRisk "High", action "Do not start yet..."
-  - score 75 → status "Good" (not "Excellent"), riskLevel "Low-medium"
-  - Types expanded: TokenBloatRisk + CostReadinessScore.riskLevel
-  - All smoke tests pass ✅
-  - npm publish --dry-run: clean, costpassport@0.1.1, 22.2 kB, 0 warnings ✅
-  - npm whoami: aramis001 ✅
-  - Git commit 00dd924, tag v0.1.1 ✅
+- v0.1.1: Scoring coherence fix ✅ npm published ✅
 
-## Blocked on
-```bash
-npm publish --otp=XXXXXX   # enter your 2FA code locally
-```
+### v0.2.0 — Live Data Layer ✅ (feature complete)
+- `src/data/resolver.ts` — loads CacheV1 first, falls back to bundled JSON. D-021.
+- `before-you-build` threshold aligned to score >= 85. D-022. ✅
+- Resolver wired into estimate + savings engines. D-023. ✅
+- `pricing:update` command — ECB live FX + Anthropic table → ~/.costpassport/cache.json. D-024. ✅
+  - ECB XML single-quoted attrs handled (resilient regex)
+  - Graceful fallback if ECB unreachable
+- `--sources` flag on estimate + savings-report. D-025. ✅
+  - JSON: additive `sources` field (backward compatible)
+  - Markdown: "Sources & Data Freshness" block appended
+  - `src/lib/source-metadata.ts` — centralised helper
+  - Canonical disclaimer phrase in estimate + savings-report engines
+  - FX assumption updated (static → reference rates / ECB or bundled)
+- Build: 82.13 KB, 0 warnings ✅
+- All smoke tests pass ✅
 
-## After publish — verify
-```bash
-npm view costpassport version      # should return 0.1.1
-npx costpassport --help
-npx costpassport token-doctor --path .
-```
+## Pending
+- [ ] Git commit + tag v0.2.0
+- [ ] npm publish v0.2.0 (requires human OTP)
 
-## Next — v0.2.0 Live Data Layer
-See ROADMAP.md for full spec.
-Key items:
-- src/data/resolver.ts — loads cache first, falls back to bundled JSON
-- costpassport pricing:update command
-- Sources visible in all reports
-- Cache in ~/.costpassport/cache.json
+## Next — v0.3.0
+- `--live` flag on estimate, token-doctor, savings-report
+- ECB fetch inline (without separate pricing:update step)
+- Graceful fallback to cache if fetch fails
+- `--sources` shows live fetch results
 
 ## Risks
-- Pricing values: heuristic — need calibration on real projects
-- before-you-build "Ready to build" threshold at score >= 75 (should be >= 85) — v0.2.0
+- Anthropic pricing table: hardcoded in pricing-update.ts — must be updated manually when prices change
 - No automated tests — regression risk on each release
-- USD/EUR rate static at 0.92 — update before v0.2.0 release

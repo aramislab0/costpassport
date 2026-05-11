@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import type { Command } from "commander";
 import { estimate } from "../engines/estimate.js";
 import { renderPassport } from "../templates/passport.js";
+import { getSourceMetadata } from "../lib/source-metadata.js";
 import type { BriefFlags } from "../types.js";
 
 async function readStdin(): Promise<string> {
@@ -26,6 +27,7 @@ export function registerEstimateCommand(program: Command): void {
     .option("--refactor", "Refactoring existing codebase", false)
     .option("--legacy", "Legacy codebase involved", false)
     .option("--format <format>", "Output format: json | markdown | passport", "json")
+    .option("--sources", "Show data sources, FX rates and freshness metadata", false)
     .action(async (opts: {
       brief?: string;
       stack?: string;
@@ -37,6 +39,7 @@ export function registerEstimateCommand(program: Command): void {
       refactor: boolean;
       legacy: boolean;
       format: string;
+      sources: boolean;
     }) => {
       let text: string;
 
@@ -63,11 +66,19 @@ export function registerEstimateCommand(program: Command): void {
       };
 
       const result = estimate({ text, flags });
+      const isMarkdown = opts.format === "markdown" || opts.format === "passport";
 
-      if (opts.format === "markdown" || opts.format === "passport") {
-        process.stdout.write(renderPassport(result) + "\n");
+      if (isMarkdown) {
+        const sourceMeta = opts.sources ? getSourceMetadata() : undefined;
+        process.stdout.write(renderPassport(result, sourceMeta) + "\n");
       } else {
-        process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+        // JSON — without --sources output is unchanged; with --sources add sources field
+        if (opts.sources) {
+          const sourceMeta = getSourceMetadata();
+          process.stdout.write(JSON.stringify({ ...result, sources: sourceMeta }, null, 2) + "\n");
+        } else {
+          process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+        }
       }
     });
 }

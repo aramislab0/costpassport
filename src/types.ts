@@ -199,3 +199,22 @@ export interface FxTable {
   mode: string;
   warning: string;
 }
+
+export interface ResolvedData {
+  pricing: PricingTable;
+  fx: FxTable;
+  /** "cache" = ~/.costpassport/cache.json was used; "bundled" = fallback to compiled-in JSON */
+  origin: "cache" | "bundled";
+  cachePath: string;
+  cacheExists: boolean;
+  /** Hours since cache was written. null when no cache exists. */
+  cacheAgeHours: number | null;
+  /** fresh < 24h | stale 24h–720h | missing = no cache or invalid */
+  freshness: "fresh" | "stale" | "missing";
+  pricingVerifiedAt: string | null;
+  fxVerifiedAt: string | null;
+  sources: {
+    pricing: string;
+    fx: string;
+  };
+}

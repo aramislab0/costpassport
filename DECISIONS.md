@@ -1,5 +1,42 @@
 # Architecture Decisions
 
+## D-025 · --sources flag exposes data provenance on estimate + savings-report — 2026-05-11
+New opt-in flag --sources added to estimate and savings-report commands.
+Without --sources: JSON output is structurally unchanged (backward compatible).
+With --sources JSON: adds top-level "sources" field (additive) with SourceMetadata.
+With --sources markdown/passport: appends "Sources & Data Freshness" block before Disclaimer.
+Source metadata centralised in src/lib/source-metadata.ts (buildSourceMetadata, getSourceMetadata, formatSourcesMarkdown).
+FxTable.mode drives ECB vs bundled detection: "ecb-live" → ECB URL, "static" → bundled label.
+Canonical disclaimer phrase added to estimate.ts and savings.ts disclaimers:
+  "Prices and exchange rates may be verified, but token volume remains an estimate based on project scope."
+savings.ts FX assumption updated from "static" to "reference rates (ECB or bundled fallback)".
+
+## D-024 · pricing:update writes local cache — 2026-05-11
+New command `pricing:update` writes ~/.costpassport/cache.json in CacheV1 format (version:1).
+Anthropic pricing: hardcoded table in pricing-update.ts, verified against official pricing page.
+FX: fetched live from ECB eurofxref XML (single-quoted attributes — regex uses ['"] for resilience).
+EUR/XOF: fixed peg 655.957 (BCEAO convention, never changes).
+Fallback: if ECB fetch fails, bundled fx.json rates are used with a warning — CLI never crashes.
+Resolver updated to detect CacheV1 (version:1 field) and transform to PricingTable/FxTable.
+CacheV1 → PricingTable: model key mapping (claude-sonnet-4-6 → sonnet-4-6 etc.), bundled models as base.
+CacheV1 → FxTable: USD_TO_EUR → rates.EUR, EUR_TO_XOF → rates.XOF_PER_EUR.
+Old cache format (without version:1) is silently ignored → fallback to bundled.
+
+## D-023 · Resolver wired into estimate + savings engines — 2026-05-11
+estimate.ts and savings.ts replace direct JSON imports with resolveCostData() from src/data/resolver.ts.
+Call is at module level (not function level): equivalent per CLI invocation (fresh process each time).
+Pricing and FX constants (PRICING, FX) now come from cache when available, bundled JSON as fallback.
+No changes to internal helper functions — same variable names, zero regression risk.
+FxTable and PricingTable type imports removed from estimate.ts (types inferred from ResolvedData).
+
+## D-022 · before-you-build threshold aligned to score >= 85 — 2026-05-11
+"Ready to build" is reserved for score >= 85 only, aligned with v0.1.1 5-tier scale.
+Old threshold was >= 75 (score "Good"), which contradicted the "Low-medium" risk level.
+70–84 → "Needs clarification" + "Almost ready, but clarify the remaining risks before starting."
+50–69 → "Needs clarification" (Medium risk, standard clarify message).
+0–49  → "Not ready yet".
+hasCriticalRisk (payments flow / scope / user roles) blocks "Ready to build" even at >= 85.
+
 ## D-020 · Scoring coherence — score drives tokenBloatRisk — 2026-05-11
 tokenBloatRisk must never contradict costReadinessScore.score.
 Fix: scoreToTokenBloatRisk(score) maps score → risk using the canonical 5-tier scale.

@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import type { Command } from "commander";
 import { savingsReport } from "../engines/savings.js";
 import { renderSavingsReport } from "../templates/savings-report.js";
+import { getSourceMetadata } from "../lib/source-metadata.js";
 import type { BriefFlags } from "../types.js";
 
 async function readStdin(): Promise<string> {
@@ -27,6 +28,7 @@ export function registerSavingsReportCommand(program: Command): void {
     .option("--refactor", "Refactoring existing codebase", false)
     .option("--legacy", "Legacy codebase involved", false)
     .option("--format <format>", "Output format: json | markdown", "json")
+    .option("--sources", "Show data sources, FX rates and freshness metadata", false)
     .action(async (opts: {
       brief?: string;
       path?: string;
@@ -39,6 +41,7 @@ export function registerSavingsReportCommand(program: Command): void {
       refactor: boolean;
       legacy: boolean;
       format: string;
+      sources: boolean;
     }) => {
       let text: string;
 
@@ -68,9 +71,15 @@ export function registerSavingsReportCommand(program: Command): void {
       const report = savingsReport({ text, flags, projectPath: opts.path });
 
       if (opts.format === "markdown") {
-        process.stdout.write(renderSavingsReport(report) + "\n");
+        const sourceMeta = opts.sources ? getSourceMetadata() : undefined;
+        process.stdout.write(renderSavingsReport(report, sourceMeta) + "\n");
       } else {
-        process.stdout.write(JSON.stringify(report, null, 2) + "\n");
+        if (opts.sources) {
+          const sourceMeta = getSourceMetadata();
+          process.stdout.write(JSON.stringify({ ...report, sources: sourceMeta }, null, 2) + "\n");
+        } else {
+          process.stdout.write(JSON.stringify(report, null, 2) + "\n");
+        }
       }
     });
 }

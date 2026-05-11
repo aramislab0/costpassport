@@ -1,4 +1,6 @@
 import type { MoneyRange, SavingsLever, SavingsReport } from "../types.js";
+import type { SourceMetadata } from "../lib/source-metadata.js";
+import { formatSourcesMarkdown } from "../lib/source-metadata.js";
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
 
@@ -21,7 +23,7 @@ function impactTag(lever: SavingsLever): string {
 
 // ─── Main renderer ────────────────────────────────────────────────────────────
 
-export function renderSavingsReport(report: SavingsReport): string {
+export function renderSavingsReport(report: SavingsReport, sources?: SourceMetadata): string {
   const lines: string[] = [];
 
   // Header
@@ -136,6 +138,14 @@ export function renderSavingsReport(report: SavingsReport): string {
   lines.push("");
   lines.push("---");
   lines.push("");
+
+  // Sources & Data Freshness (only when --sources flag is set)
+  if (sources) {
+    lines.push(formatSourcesMarkdown(sources));
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+  }
 
   // Disclaimer
   lines.push("## Disclaimer");

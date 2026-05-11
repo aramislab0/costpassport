@@ -1,27 +1,24 @@
 import { rangeToCurrencies } from "../lib/currency.js";
 import { computeScore } from "../lib/score.js";
+import { resolveCostData } from "../data/resolver.js";
 import type {
   BriefFlags,
   ComplexityTier,
   Confidence,
   Estimate,
-  FxTable,
   ModelKey,
   ModelMix,
   ProjectType,
-  PricingTable,
   Range,
   Scenario,
   ScenarioName,
 } from "../types.js";
-import pricingRaw from "../resources/pricing.anthropic.json" with { type: "json" };
-import fxRaw from "../resources/fx.json" with { type: "json" };
 import tiersRaw from "../resources/complexity-tiers.json" with { type: "json" };
 
-const VERSION = "0.1.1";
+const VERSION = "0.2.0";
 
-const PRICING = pricingRaw as unknown as PricingTable;
-const FX = fxRaw as unknown as FxTable;
+// Resolved at startup — reads ~/.costpassport/cache.json if available, falls back to bundled JSON.
+const { pricing: PRICING, fx: FX } = resolveCostData();
 
 const TIERS_CONFIG = tiersRaw as unknown as {
   tiers: Record<ComplexityTier, Range>;
@@ -209,7 +206,7 @@ export function estimate({ text, flags }: { text: string; flags: BriefFlags }): 
     topCostDrivers: topCostDrivers(flags, projectType),
     optimizationHints: optimizationHints(flags),
     assumptions: buildAssumptions(flags),
-    disclaimer: `Estimates are heuristic. Actual cost may vary ${errorMargin}. CostPassport is calibrated on representative projects, not your specific case.`,
+    disclaimer: `Estimates are heuristic. Actual cost may vary ${errorMargin}. CostPassport is calibrated on representative projects, not your specific case. Prices and exchange rates may be verified, but token volume remains an estimate based on project scope.`,
     meta: {
       generated_at: new Date().toISOString(),
       costpassport_version: VERSION,

@@ -2,6 +2,7 @@ import { estimate as runEstimate } from "./estimate.js";
 import { scanProject } from "../lib/project-scan.js";
 import type { ProjectSignals } from "../lib/project-scan.js";
 import { usdToEur, eurToXof } from "../lib/currency.js";
+import { resolveCostData } from "../data/resolver.js";
 import type {
   BriefFlags,
   Estimate,
@@ -9,11 +10,11 @@ import type {
   SavingsLever,
   SavingsReport,
 } from "../types.js";
-import fxRaw from "../resources/fx.json" with { type: "json" };
-import type { FxTable } from "../types.js";
 
-const VERSION = "0.1.1";
-const FX = fxRaw as unknown as FxTable;
+const VERSION = "0.2.0";
+
+// Resolved at startup — reads ~/.costpassport/cache.json if available, falls back to bundled JSON.
+const { fx: FX } = resolveCostData();
 
 // ─── Savings % from score ─────────────────────────────────────────────────────
 
@@ -178,10 +179,10 @@ export function savingsReport({
       "Current cost baseline: Standard scenario (Sonnet 4.6, 65% input / 35% output ratio)",
       "Optimized cost assumes all listed levers are applied",
       "Savings percentages are heuristic — actual savings depend on implementation discipline",
-      "FX rates are static — verify before using for client billing",
+      "FX rates are reference rates (ECB via pricing:update or bundled fallback) — verify before client billing",
     ],
     disclaimer:
-      "Savings estimates are heuristic. Actual reduction depends on how rigorously optimizations are applied. CostPassport is calibrated on representative projects, not your specific case.",
+      "Savings estimates are heuristic. Actual reduction depends on how rigorously optimizations are applied. CostPassport is calibrated on representative projects, not your specific case. Prices and exchange rates may be verified, but token volume remains an estimate based on project scope.",
     meta: { generated_at: new Date().toISOString(), costpassport_version: VERSION },
   };
 }

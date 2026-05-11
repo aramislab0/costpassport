@@ -6,7 +6,7 @@ import type {
   ReadinessReport,
 } from "../types.js";
 
-const VERSION = "0.1.1";
+const VERSION = "0.2.0";
 
 // ─── Fuzzy point detection ────────────────────────────────────────────────────
 
@@ -153,10 +153,15 @@ function computeDecision(
     fuzzyPoints.some(p => p.includes("Scope too broad")) ||
     fuzzyPoints.some(p => p.includes("User roles"));
 
+  // D-022: "Ready to build" is reserved for score >= 85 only (aligned with v0.1.1 scoring).
+  // 70–84 = "Needs clarification" (Low-medium risk — almost ready, not ready yet).
+  // 50–69 = "Needs clarification" (Medium risk).
+  // 0–49  = "Not ready yet".
+  // hasCriticalRisk blocks "Ready to build" even at score >= 85.
   let decision: ReadinessDecision;
-  if (score >= 75 && !hasCriticalRisk) {
+  if (score >= 85 && !hasCriticalRisk) {
     decision = "Ready to build";
-  } else if (score >= 55 || !hasCriticalRisk) {
+  } else if (score >= 50 && !hasCriticalRisk) {
     decision = "Needs clarification";
   } else {
     decision = "Not ready yet";
@@ -165,11 +170,13 @@ function computeDecision(
   const buildDecision =
     decision === "Ready to build"
       ? "You can start with the MVP build. Follow the suggested phase order to stay within budget."
-      : decision === "Needs clarification"
-        ? fuzzyPoints.length > 0
-          ? `Clarify ${fuzzyPoints.slice(0, 2).map(p => p.split("—")[0].trim().toLowerCase()).join(" and ")} before starting the full build.`
-          : "Refine your brief before starting — the scope is unclear."
-        : "Do not start the full build yet. Define scope, roles, and critical flows first.";
+      : decision === "Needs clarification" && score >= 70
+        ? "Almost ready, but clarify the remaining risks before starting."
+        : decision === "Needs clarification"
+          ? fuzzyPoints.length > 0
+            ? `Clarify ${fuzzyPoints.slice(0, 2).map(p => p.split("—")[0].trim().toLowerCase()).join(" and ")} before starting the full build.`
+            : "Refine your brief before starting — the scope is unclear."
+          : "Do not start the full build yet. Define scope, roles, and critical flows first.";
 
   return { decision, buildDecision };
 }

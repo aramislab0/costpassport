@@ -1,4 +1,6 @@
 import type { Estimate, ScenarioName } from "../types.js";
+import type { SourceMetadata } from "../lib/source-metadata.js";
+import { formatSourcesMarkdown } from "../lib/source-metadata.js";
 
 function riskLevel(score: number): string {
   if (score >= 70) return "Low";
@@ -65,7 +67,7 @@ const SCENARIO_DESC: Record<ScenarioName, string> = {
 
 // ─── Main renderer ───────────────────────────────────────────────────────────
 
-export function renderPassport(estimate: Estimate): string {
+export function renderPassport(estimate: Estimate, sources?: SourceMetadata): string {
   const score = estimate.costReadinessScore.score;
   const risk = riskLevel(score);
   const action = recommendedAction(estimate, score);
@@ -190,6 +192,14 @@ export function renderPassport(estimate: Estimate): string {
   lines.push("");
   lines.push("---");
   lines.push("");
+
+  // Sources & Data Freshness (only when --sources flag is set)
+  if (sources) {
+    lines.push(formatSourcesMarkdown(sources));
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+  }
 
   // Disclaimer
   lines.push("## Disclaimer");
