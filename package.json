@@ -1,0 +1,60 @@
+{
+  "name": "costpassport",
+  "version": "0.1.0",
+  "description": "AI Project Cost Planner. Know your AI build cost before you start.",
+  "type": "module",
+  "bin": {
+    "costpassport": "dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "files": [
+    "dist",
+    "src/resources",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsup",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "cursor",
+    "ai",
+    "tokens",
+    "finops",
+    "cost-estimation",
+    "ai-build-cost",
+    "cli",
+    "llm",
+    "developer-tools",
+    "agents",
+    "anthropic"
+  ],
+  "author": "Aramis Assane <aramislab0@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aramislab/costpassport.git"
+  },
+  "homepage": "https://github.com/aramislab/costpassport#readme",
+  "bugs": {
+    "url": "https://github.com/aramislab/costpassport/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "@types/node": "^22.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

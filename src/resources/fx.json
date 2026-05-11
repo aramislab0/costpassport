@@ -1,0 +1,11 @@
+{
+  "base": "USD",
+  "rates": {
+    "EUR": 0.92,
+    "XOF_PER_EUR": 655.957
+  },
+  "last_updated": "2026-05-10",
+  "mode": "static",
+  "warning": "Static FX rates. Verify USD/EUR before commercial or client billing use. XOF/EUR peg is fixed by CFA franc convention.",
+  "usd_eur_note": "Update rates field EUR value periodically. Suggested source: ECB reference rates."
+}

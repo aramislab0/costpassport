@@ -1,0 +1,35 @@
+{
+  "tiers": {
+    "Simple":   { "low": 200000,    "high": 500000 },
+    "Standard": { "low": 800000,    "high": 2000000 },
+    "Complex":  { "low": 3000000,   "high": 8000000 },
+    "Heavy":    { "low": 10000000,  "high": 30000000 }
+  },
+  "multipliers": {
+    "mobile":   1.3,
+    "refactor": 1.4,
+    "legacy":   1.8
+  },
+  "addons_tokens": {
+    "payments":     500000,
+    "ai":           1000000,
+    "realtime":     800000,
+    "i18n":         200000,
+    "auth_complex": 300000
+  },
+  "scenario_factors": {
+    "economy":  0.8,
+    "standard": 1.0,
+    "premium":  1.3
+  },
+  "scenario_io_ratios": {
+    "economy":  { "input": 0.75, "output": 0.25 },
+    "standard": { "input": 0.65, "output": 0.35 },
+    "premium":  { "input": 0.60, "output": 0.40 }
+  },
+  "scenario_model_mix": {
+    "economy":  { "sonnet-4-6": 0.8, "haiku-4-5": 0.2 },
+    "standard": { "sonnet-4-6": 1.0 },
+    "premium":  { "sonnet-4-6": 0.7, "opus-4-6": 0.3 }
+  }
+}

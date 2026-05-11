@@ -1,0 +1,30 @@
+# Build artifacts
+dist/
+build/
+*.tgz
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+*.local
+
+# Logs
+*.log
+logs/
+tmp/
+
+# Generated reports
+reports/generated/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git internals
+.git/
+
+# Test coverage
+coverage/

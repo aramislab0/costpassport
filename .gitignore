@@ -1,0 +1,26 @@
+# Build
+dist/
+build/
+*.tgz
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+*.local
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Temp
+tmp/

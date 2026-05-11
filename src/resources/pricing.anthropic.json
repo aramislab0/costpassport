@@ -1,0 +1,42 @@
+{
+  "pricing_last_verified": "2026-05-10",
+  "source_note": "Anthropic official pricing page. Verify before commercial use.",
+  "batch_discount": 0.5,
+  "opus_4_7_tokenizer_risk": "May use up to 35% more tokens for the same fixed text.",
+  "currency": "USD",
+  "unit": "USD per million tokens (MTok)",
+  "models": {
+    "opus-4-7": {
+      "label": "Claude Opus 4.7",
+      "input": 5,
+      "output": 25,
+      "cache_write_5m": 6.25,
+      "cache_write_1h": 10,
+      "cache_hit": 0.5
+    },
+    "opus-4-6": {
+      "label": "Claude Opus 4.6",
+      "input": 5,
+      "output": 25,
+      "cache_write_5m": 6.25,
+      "cache_write_1h": 10,
+      "cache_hit": 0.5
+    },
+    "sonnet-4-6": {
+      "label": "Claude Sonnet 4.6",
+      "input": 3,
+      "output": 15,
+      "cache_write_5m": 3.75,
+      "cache_write_1h": 6,
+      "cache_hit": 0.3
+    },
+    "haiku-4-5": {
+      "label": "Claude Haiku 4.5",
+      "input": 1,
+      "output": 5,
+      "cache_write_5m": 1.25,
+      "cache_write_1h": 2,
+      "cache_hit": 0.1
+    }
+  }
+}
