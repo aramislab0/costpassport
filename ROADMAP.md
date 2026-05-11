@@ -1,29 +1,62 @@
 # CostPassport Roadmap
 
-## Phase 1 — POC (J1–J3)
-- T-001 estimate engine + CLI ✅
-- T-002 AI Build Cost Passport — Markdown rendering ✅
-- T-003 before-you-build command ✅
+## v0.1.0 — CLI MVP ✅ Published
+- estimate, before-you-build, token-doctor, savings-report
+- USD / EUR / XOF support
+- Economy / Standard / Premium scenarios
+- JSON + Markdown + passport output formats
+- Local-first, no telemetry, MIT
 
-## Phase 2 — MVP (J4–J7)
-- T-004 token-doctor (with context-diet section) ✅
-- T-005 savings-report + chaos-brief + .gitignore/.claudeignore detection ✅
-- T-006 npm publish prep — README, CLAUDE.md, dotfiles, docs, dry-run ✅
+## v0.1.1 — Scoring coherence ✅ Ready to publish (pending OTP)
+- tokenBloatRisk now derived from costReadinessScore.score (not just leak count)
+- 5-tier scoring scale: Low / Low-medium / Medium / Medium-high / High
+- score 15 → "High risk" everywhere, no more "Safe to continue"
+- score 75 → "Good" (not "Excellent")
+- recommendedNextAction aligned per tier across all commands
 
-## Phase 3 — Beta privée
-- npm publish v0.1.0 (pending: `npm login` from human)
-- GitHub repo public + release v0.1.0
-- X / LinkedIn / Show HN / Product Hunt launch
-- 10 testers, 10 real briefs, calibration
-- Tier rules calibration from real data
+## v0.2.0 — Live Data Layer
+**Goal:** CostPassport becomes traceable — every report cites its sources.
 
-## Phase 4 — V1.1
-- /context-diet, /burn-rate, /model-router, /roast-my-tokens
-- GitHub badge "CostPassport Verified"
-- Per-phase token budget allocation
-- CLAUDE.md generator from brief
+- New command: `costpassport pricing:update`
+  - Fetches model prices and exchange rates
+  - Writes local cache to `~/.costpassport/cache.json`
+  - Displays source URL + verification date
+  - Warns if cache is older than 30 days
+- New module: `src/data/resolver.ts`
+  - Loads from `~/.costpassport/cache.json` first, falls back to bundled JSON
+- Reports display: `pricing_source`, `fx_source`, `pricing_verified_at`, `fx_verified_at`, `cache_age`
+- Disclaimer phrase added to all reports:
+  "Prices and exchange rates may be verified, but token volume remains an estimate based on project scope."
+- Flag `--sources` on `estimate` and `token-doctor`: shows source metadata inline
+- Fix: `before-you-build` "Ready to build" threshold aligned to score ≥ 85
+- Architecture: CostPassport remains local-first, no server required
 
-## Phase 5 — SaaS
-- Dashboard, teams, agencies
-- Multi-model: OpenAI, Gemini, Cursor, Replit
-- Claude Code plugin (J7 wrapper)
+## v0.3.0 — Mode --live + FX sérieux
+- Flag `--live` on estimate, token-doctor, savings-report
+- Fetches fresh data before calculation when online
+- Graceful fallback to cache if fetch fails
+- ECB reference rates as default source for USD/EUR
+- Flag `--sources` shows live fetch results
+
+## v0.4.0 — Plugin Claude Code
+- Skill `/costpassport:preflight` — analyzes brief before build, checks budget, lists risks
+- Skill `/costpassport:doctor` — quick diagnosis in session
+- Skill `/costpassport:savings` — savings report in session
+- Built on existing engines, no duplication
+
+## v0.5.0 — compare: estimated vs actual
+- `costpassport usage:import` — parses Claude Code / Cursor / Anthropic console exports
+- `costpassport compare` — estimated vs actual delta + probable cause
+- Local history in `~/.costpassport/history/`
+
+## v0.6.0 — budget-guard
+- `costpassport budget-guard --brief brief.md --max-usd 100`
+- within budget / over budget decision
+- Scope reduction recommendations if over budget
+
+## Future — Supabase (optional backend, not local replacement)
+- npm = CLI distribution
+- Supabase = live data, snapshots, prices, rates, history, agency mode
+- No source code sent to Supabase
+- No sensitive data collected without explicit consent
+- Tables: model_prices, fx_rates, pricing_snapshots, estimate_reports

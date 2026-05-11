@@ -1,5 +1,11 @@
 # Architecture Decisions
 
+## D-020 · Scoring coherence — score drives tokenBloatRisk — 2026-05-11
+tokenBloatRisk must never contradict costReadinessScore.score.
+Fix: scoreToTokenBloatRisk(score) maps score → risk using the canonical 5-tier scale.
+Final tokenBloatRisk = max(scoreBasedRisk, leakBasedRisk) via RISK_RANK ordering.
+Same 5-tier thresholds applied in score.ts, doctor.ts, savings.ts, token-doctor template.
+
 ## D-019 · npm publish requires human auth — 2026-05-10
 `npm publish` blocked by ENEEDAUTH during T-008. Claude does not run `npm login` autonomously.
 Human must run `npm login` then `npm publish`. All pre-publish checks (build, dry-run, name availability) passed.

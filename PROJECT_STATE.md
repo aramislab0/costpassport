@@ -1,50 +1,45 @@
 # CostPassport — Project State
-**Phase:** Ready to Publish — waiting for `npm login`
-**Last update:** 2026-05-10
-**Version:** 0.1.0
+**Phase:** v0.1.1 — Ready to publish (pending npm OTP)
+**Last update:** 2026-05-11
+**Version local:** 0.1.1
+**Version npm:** 0.1.0 (0.1.1 publish blocked on user OTP)
 
 ## Done
-- Repo scaffold + types + currency + estimate engine + CLI ✅
-- T-002: AI Build Cost Passport — Markdown renderer ✅
-- T-003: `before-you-build` command ✅
-- T-004: `token-doctor` command ✅
-- T-005: `savings-report` command + chaos-brief + detection fixes ✅
-- T-006: Launch readiness (README, CLAUDE.md, dotfiles, LICENSE, docs) ✅
-- T-007: Release candidate review — READY TO PUBLISH ✅
-- T-008: Publish attempt ✅ (blocked on npm auth — not a code issue)
-  - Final build: clean (66.38 KB)
-  - `npm view costpassport` → E404 (name still available)
-  - `npm publish --dry-run` → zero warnings, `+ costpassport@0.1.0`
-  - `npm whoami` → ENEEDAUTH
-  - docs/LAUNCH.md updated with npm login steps, GitHub release notes, checklist
-  - docs/POSTS.md created: X post, X thread (7 tweets), LinkedIn short + long, Show HN, Product Hunt tagline + description, GitHub release notes
+- v0.1.0: Full MVP — estimate, before-you-build, token-doctor, savings-report ✅
+- v0.1.0: npm published, npx costpassport works ✅
+- v0.1.1: Scoring coherence fix ✅
+  - tokenBloatRisk derived from score via scoreToTokenBloatRisk() + max(scoreRisk, leakRisk)
+  - 5-tier mapping: Low / Low-medium / Medium / Medium-high / High + Critical for 7+ leaks
+  - score 15 → tokenBloatRisk "High", action "Do not start yet..."
+  - score 75 → status "Good" (not "Excellent"), riskLevel "Low-medium"
+  - Types expanded: TokenBloatRisk + CostReadinessScore.riskLevel
+  - All smoke tests pass ✅
+  - npm publish --dry-run: clean, costpassport@0.1.1, 22.2 kB, 0 warnings ✅
+  - npm whoami: aramis001 ✅
+  - Git commit 00dd924, tag v0.1.1 ✅
 
-## Next — One action away from publish
-
+## Blocked on
 ```bash
-npm login          # authenticate with npmjs.org account
-npm whoami         # verify: should return your npm username
-npm publish        # publish costpassport@0.1.0
-npm view costpassport          # verify publication
-npx costpassport --help        # live test from registry
+npm publish --otp=XXXXXX   # enter your 2FA code locally
 ```
 
-## Post-publish
-- [ ] GitHub repo created (name: `costpassport`)
-- [ ] `git push` and tag `v0.1.0`
-- [ ] GitHub release created (notes in docs/LAUNCH.md)
-- [ ] X/Twitter post (text in docs/POSTS.md)
-- [ ] LinkedIn post (text in docs/POSTS.md)
-- [ ] Show HN submitted Tue–Thu morning UTC (title + body in docs/POSTS.md)
-- [ ] Product Hunt draft (description in docs/POSTS.md)
-- [ ] 5 terminal screenshots (commands in docs/LAUNCH.md)
+## After publish — verify
+```bash
+npm view costpassport version      # should return 0.1.1
+npx costpassport --help
+npx costpassport token-doctor --path .
+```
+
+## Next — v0.2.0 Live Data Layer
+See ROADMAP.md for full spec.
+Key items:
+- src/data/resolver.ts — loads cache first, falls back to bundled JSON
+- costpassport pricing:update command
+- Sources visible in all reports
+- Cache in ~/.costpassport/cache.json
 
 ## Risks
-- npm name `costpassport` is free today — publish fast
-- Pricing values: heuristic, need calibration on real projects
-- USD/EUR rate is static at 0.92 — update on publish day if needed
-
-## Budget
-- T-001 cost: ~$3
-- T-002–T-008 estimate: ~$18
-- Remaining for beta: ~$9
+- Pricing values: heuristic — need calibration on real projects
+- before-you-build "Ready to build" threshold at score >= 75 (should be >= 85) — v0.2.0
+- No automated tests — regression risk on each release
+- USD/EUR rate static at 0.92 — update before v0.2.0 release
