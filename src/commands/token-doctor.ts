@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import type { Command } from "commander";
 import { tokenDoctor } from "../engines/doctor.js";
+import { runPricingUpdate } from "../engines/pricing-update.js";
 import { renderTokenDoctor } from "../templates/token-doctor.js";
 import type { BriefFlags } from "../types.js";
 
@@ -27,6 +28,7 @@ export function registerTokenDoctorCommand(program: Command): void {
     .option("--refactor", "Refactoring existing codebase", false)
     .option("--legacy", "Legacy codebase involved", false)
     .option("--format <format>", "Output format: json | markdown", "json")
+    .option("--live", "Fetch latest FX rates from ECB before calculating", false)
     .action(async (opts: {
       brief?: string;
       path?: string;
@@ -39,6 +41,7 @@ export function registerTokenDoctorCommand(program: Command): void {
       refactor: boolean;
       legacy: boolean;
       format: string;
+      live: boolean;
     }) => {
       let text: string;
 
@@ -52,6 +55,17 @@ export function registerTokenDoctorCommand(program: Command): void {
         return;
       } else {
         text = "";
+      }
+
+      // --live: fetch ECB rates and write cache before running the engine.
+      if (opts.live) {
+        process.stderr.write("[costpassport] Fetching live FX rates from ECB…\n");
+        const liveResult = await runPricingUpdate();
+        if (liveResult.fxLive) {
+          process.stderr.write(`[costpassport] ECB rate: EUR/USD ${liveResult.eurToUsd} (${liveResult.fxVerifiedAt})\n`);
+        } else {
+          process.stderr.write(`[costpassport] ECB unavailable — using bundled fallback rates. (${liveResult.fxError ?? "unknown error"})\n`);
+        }
       }
 
       const flags: BriefFlags = {

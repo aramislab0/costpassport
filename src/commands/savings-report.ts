@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import type { Command } from "commander";
 import { savingsReport } from "../engines/savings.js";
+import { runPricingUpdate } from "../engines/pricing-update.js";
 import { renderSavingsReport } from "../templates/savings-report.js";
 import { getSourceMetadata } from "../lib/source-metadata.js";
 import type { BriefFlags } from "../types.js";
@@ -29,6 +30,7 @@ export function registerSavingsReportCommand(program: Command): void {
     .option("--legacy", "Legacy codebase involved", false)
     .option("--format <format>", "Output format: json | markdown", "json")
     .option("--sources", "Show data sources, FX rates and freshness metadata", false)
+    .option("--live", "Fetch latest FX rates from ECB before calculating", false)
     .action(async (opts: {
       brief?: string;
       path?: string;
@@ -42,6 +44,7 @@ export function registerSavingsReportCommand(program: Command): void {
       legacy: boolean;
       format: string;
       sources: boolean;
+      live: boolean;
     }) => {
       let text: string;
 
@@ -55,6 +58,19 @@ export function registerSavingsReportCommand(program: Command): void {
         return;
       } else {
         text = "";
+      }
+
+      // --live: fetch ECB rates and write cache before running the engine.
+      // The engine reads the cache at call time, so it picks up the fresh data.
+      let liveResult: Awaited<ReturnType<typeof runPricingUpdate>> | undefined;
+      if (opts.live) {
+        process.stderr.write("[costpassport] Fetching live FX rates from ECB…\n");
+        liveResult = await runPricingUpdate();
+        if (liveResult.fxLive) {
+          process.stderr.write(`[costpassport] ECB rate: EUR/USD ${liveResult.eurToUsd} (${liveResult.fxVerifiedAt})\n`);
+        } else {
+          process.stderr.write(`[costpassport] ECB unavailable — using bundled fallback rates. (${liveResult.fxError ?? "unknown error"})\n`);
+        }
       }
 
       const flags: BriefFlags = {
@@ -71,11 +87,11 @@ export function registerSavingsReportCommand(program: Command): void {
       const report = savingsReport({ text, flags, projectPath: opts.path });
 
       if (opts.format === "markdown") {
-        const sourceMeta = opts.sources ? getSourceMetadata() : undefined;
+        const sourceMeta = opts.sources ? getSourceMetadata(liveResult) : undefined;
         process.stdout.write(renderSavingsReport(report, sourceMeta) + "\n");
       } else {
         if (opts.sources) {
-          const sourceMeta = getSourceMetadata();
+          const sourceMeta = getSourceMetadata(liveResult);
           process.stdout.write(JSON.stringify({ ...report, sources: sourceMeta }, null, 2) + "\n");
         } else {
           process.stdout.write(JSON.stringify(report, null, 2) + "\n");

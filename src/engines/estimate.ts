@@ -6,8 +6,10 @@ import type {
   ComplexityTier,
   Confidence,
   Estimate,
+  FxTable,
   ModelKey,
   ModelMix,
+  PricingTable,
   ProjectType,
   Range,
   Scenario,
@@ -15,10 +17,7 @@ import type {
 } from "../types.js";
 import tiersRaw from "../resources/complexity-tiers.json" with { type: "json" };
 
-const VERSION = "0.2.0";
-
-// Resolved at startup — reads ~/.costpassport/cache.json if available, falls back to bundled JSON.
-const { pricing: PRICING, fx: FX } = resolveCostData();
+const VERSION = "0.3.0";
 
 const TIERS_CONFIG = tiersRaw as unknown as {
   tiers: Record<ComplexityTier, Range>;
@@ -82,7 +81,12 @@ function applyMultipliersAndAddons(baseRange: Range, flags: BriefFlags): Range {
   };
 }
 
-function buildScenario(name: ScenarioName, baseRange: Range): Scenario {
+function buildScenario(
+  name: ScenarioName,
+  baseRange: Range,
+  pricing: PricingTable,
+  fx: FxTable,
+): Scenario {
   const factor = TIERS_CONFIG.scenario_factors[name];
   const ratio = TIERS_CONFIG.scenario_io_ratios[name];
   const mix: Partial<Record<ModelKey, number>> = TIERS_CONFIG.scenario_model_mix[name];
@@ -98,8 +102,8 @@ function buildScenario(name: ScenarioName, baseRange: Range): Scenario {
   let blendedInput = 0;
   let blendedOutput = 0;
   for (const [model, share] of Object.entries(mix) as [ModelKey, number][]) {
-    blendedInput += share * PRICING.models[model].input;
-    blendedOutput += share * PRICING.models[model].output;
+    blendedInput += share * pricing.models[model].input;
+    blendedOutput += share * pricing.models[model].output;
   }
 
   const usdLow = (inLow / 1e6) * blendedInput + (outLow / 1e6) * blendedOutput;
@@ -112,7 +116,7 @@ function buildScenario(name: ScenarioName, baseRange: Range): Scenario {
     outputTokensRange: { low: outLow, high: outHigh },
     inputOutputRatio: ratio,
     modelMix: mix as ModelMix,
-    cost: rangeToCurrencies({ low: usdLow, high: usdHigh }, FX),
+    cost: rangeToCurrencies({ low: usdLow, high: usdHigh }, fx),
   };
 }
 
@@ -178,6 +182,10 @@ function buildAssumptions(flags: BriefFlags): string[] {
 }
 
 export function estimate({ text, flags }: { text: string; flags: BriefFlags }): Estimate {
+  // Resolved at call time — reads ~/.costpassport/cache.json if available, falls back to bundled JSON.
+  // Function-level (not module-level) so --live can write a fresh cache before this runs.
+  const { pricing: PRICING, fx: FX } = resolveCostData();
+
   const projectType = detectProjectType(text);
   const complexityTier = detectTier(projectType, flags, text);
   const baseRange = TIERS_CONFIG.tiers[complexityTier];
@@ -187,9 +195,9 @@ export function estimate({ text, flags }: { text: string; flags: BriefFlags }): 
   const costReadinessScore = computeScore(confidence, complexityTier, missing.length, flags);
 
   const scenarios = {
-    economy: buildScenario("economy", adjustedRange),
-    standard: buildScenario("standard", adjustedRange),
-    premium: buildScenario("premium", adjustedRange),
+    economy: buildScenario("economy", adjustedRange, PRICING, FX),
+    standard: buildScenario("standard", adjustedRange, PRICING, FX),
+    premium: buildScenario("premium", adjustedRange, PRICING, FX),
   };
 
   const errorMargin = confidence === "low" ? "±50%" : "±30%";

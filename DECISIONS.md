@@ -1,5 +1,19 @@
 # Architecture Decisions
 
+## D-026 · --live flag fetches ECB FX inline before calculation — 2026-05-11
+New opt-in flag --live added to estimate, savings-report, and token-doctor.
+Without --live: behaviour unchanged (reads cache if available, falls back to bundled JSON).
+With --live: calls runPricingUpdate() before the engine runs, writes ~/.costpassport/cache.json.
+Engine functions (estimate, savingsReport) now call resolveCostData() at function level (not module level)
+so the freshly written cache is picked up in the same process invocation.
+buildScenario() and toMoneyRange() now accept (pricing, fx) as explicit parameters — no module-level globals.
+SourceMetadata.data_origin expanded to "live_fetch" | "cache" | "bundled".
+LiveRefreshResult (alias of PricingUpdateResult) passed to getSourceMetadata(liveResult?) to override
+data_origin, FX rates, and warnings with live fetch result.
+ECB fetch failure: graceful fallback to bundled rates; liveResult.fxLive = false; stderr warning printed.
+No project data ever sent to any network — only ECB exchange rate XML is fetched.
+Decision: reuse runPricingUpdate() engine entirely — zero duplication between pricing:update and --live.
+
 ## D-025 · --sources flag exposes data provenance on estimate + savings-report — 2026-05-11
 New opt-in flag --sources added to estimate and savings-report commands.
 Without --sources: JSON output is structurally unchanged (backward compatible).

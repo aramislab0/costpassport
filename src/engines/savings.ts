@@ -6,15 +6,13 @@ import { resolveCostData } from "../data/resolver.js";
 import type {
   BriefFlags,
   Estimate,
+  FxTable,
   MoneyRange,
   SavingsLever,
   SavingsReport,
 } from "../types.js";
 
-const VERSION = "0.2.0";
-
-// Resolved at startup — reads ~/.costpassport/cache.json if available, falls back to bundled JSON.
-const { fx: FX } = resolveCostData();
+const VERSION = "0.3.0";
 
 // ─── Savings % from score ─────────────────────────────────────────────────────
 
@@ -39,15 +37,15 @@ function savingsPercent(estimate: Estimate, signals: ProjectSignals | null): { m
 
 // ─── Money helpers ────────────────────────────────────────────────────────────
 
-function toMoneyRange(usdLow: number, usdHigh: number): {
+function toMoneyRange(usdLow: number, usdHigh: number, fx: FxTable): {
   usd: MoneyRange; eur: MoneyRange; xof: MoneyRange;
 } {
-  const eurLow = usdToEur(usdLow, FX);
-  const eurHigh = usdToEur(usdHigh, FX);
+  const eurLow = usdToEur(usdLow, fx);
+  const eurHigh = usdToEur(usdHigh, fx);
   return {
     usd: { min: Math.round(usdLow * 100) / 100, max: Math.round(usdHigh * 100) / 100 },
     eur: { min: eurLow, max: eurHigh },
-    xof: { min: eurToXof(eurLow, FX), max: eurToXof(eurHigh, FX) },
+    xof: { min: eurToXof(eurLow, fx), max: eurToXof(eurHigh, fx) },
   };
 }
 
@@ -125,20 +123,24 @@ export function savingsReport({
   flags: BriefFlags;
   projectPath?: string;
 }): SavingsReport {
+  // Resolved at call time — reads ~/.costpassport/cache.json if available, falls back to bundled JSON.
+  // Function-level (not module-level) so --live can write a fresh cache before this runs.
+  const { fx: FX } = resolveCostData();
+
   const signals = projectPath ? scanProject(projectPath) : null;
   const estimateResult = runEstimate({ text: text || "project", flags });
 
   const standard = estimateResult.scenarios.standard;
   const currentUsdLow = standard.cost.USD.low;
   const currentUsdHigh = standard.cost.USD.high;
-  const currentCostRanges = toMoneyRange(currentUsdLow, currentUsdHigh);
+  const currentCostRanges = toMoneyRange(currentUsdLow, currentUsdHigh, FX);
 
   const { min: minSavings, max: maxSavings } = savingsPercent(estimateResult, signals);
 
   // optimized = current × (1 - savings%), with max savings applied to low, min to high
   const optUsdLow = Math.round(currentUsdLow * (1 - maxSavings / 100) * 100) / 100;
   const optUsdHigh = Math.round(currentUsdHigh * (1 - minSavings / 100) * 100) / 100;
-  const optimizedCostRanges = toMoneyRange(optUsdLow, optUsdHigh);
+  const optimizedCostRanges = toMoneyRange(optUsdLow, optUsdHigh, FX);
 
   // savings = current × savings%
   const savUsdMin = Math.round(currentUsdLow * minSavings / 100 * 100) / 100;
