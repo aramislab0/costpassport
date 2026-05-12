@@ -1,5 +1,18 @@
 # Architecture Decisions
 
+## D-029 · Keep CTOP Pro engine out of public distribution — 2026-05-12
+The advanced optimization features of CTOP are commercially sensitive and reserved for a future Pro version.
+Decision: public CLI exposes free preview only (risk level, savings estimate, 3 generic actions, locked sections).
+Advanced optimization features are planned for a future Pro version of CostPassport.
+Bundle size: 92.18 KB. Tarball: 10 files, 28.2 KB, no source files, no private assets.
+
+## D-028 · CTOP — CostPassport Token Optimization Protocol — 2026-05-12
+New command: `costpassport optimize` — free preview.
+Output: protocol, riskLevel, currentTokensRange, estimatedSavingsPercent, topActionsPreview (3 items), lockedSections, upgradeMessage.
+--write: blocked in public build — returns "not available in the public CLI yet."
+Output formats: json | markdown.
+No version bump. No npm publish.
+
 ## D-027 · Add automated core tests before plugin work — 2026-05-11
 First automated test suite (vitest) covering the 5 critical risk areas:
   1. FX conversion chain — USD → EUR → XOF, peg 655.957, rounding at each step

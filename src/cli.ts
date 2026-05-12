@@ -4,6 +4,7 @@ import { registerBeforeYouBuildCommand } from "./commands/before-you-build.js";
 import { registerTokenDoctorCommand } from "./commands/token-doctor.js";
 import { registerSavingsReportCommand } from "./commands/savings-report.js";
 import { registerPricingUpdateCommand } from "./commands/pricing-update.js";
+import { registerOptimizeCommand } from "./commands/optimize.js";
 
 const program = new Command();
 
@@ -17,6 +18,7 @@ registerBeforeYouBuildCommand(program);
 registerTokenDoctorCommand(program);
 registerSavingsReportCommand(program);
 registerPricingUpdateCommand(program);
+registerOptimizeCommand(program);
 
 program.parseAsync(process.argv).catch((err: Error) => {
   process.stderr.write(`[costpassport] error: ${err.message}\n`);

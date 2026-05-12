@@ -218,3 +218,110 @@ export interface ResolvedData {
     fx: string;
   };
 }
+
+// ─── CTOP — CostPassport Token Optimization Protocol ─────────────────────────
+
+export type ContextCategory =
+  | "STABLE_CONTEXT"
+  | "TASK_CONTEXT"
+  | "CODE_CONTEXT"
+  | "NOISY_CONTEXT"
+  | "REPEATED_CONTEXT"
+  | "UNKNOWN_CONTEXT";
+
+export type ContextDecision =
+  | "KEEP"
+  | "CACHE"
+  | "COMPRESS"
+  | "SPLIT"
+  | "EXCLUDE"
+  | "DEFER"
+  | "CLARIFY";
+
+export interface ContextElement {
+  name: string;
+  category: ContextCategory;
+  decision: ContextDecision;
+  /** 1–10 relative token weight */
+  token_weight: number;
+  /** 0–1 how relevant to the current task */
+  relevance_score: number;
+  /** 0–1 higher = more stable = more cacheable */
+  stability_score: number;
+  /** 0–1 higher = more likely to waste tokens */
+  risk_score: number;
+  /** 0–1 how often this context is reused across sessions */
+  reuse_frequency: number;
+  rationale: string;
+}
+
+export interface CtopAction {
+  id: string;
+  name: string;
+  category: string;
+  priority: "critical" | "high" | "medium" | "low";
+  estimatedTokensSaved: number;
+  estimatedSavingsPercent: number;
+  /** Composite impact score used for action prioritization */
+  impact_score: number;
+  implementation: string;
+  reversibility: "immediate" | "low_effort" | "medium_effort" | "high_effort";
+  confidence: "high" | "medium" | "low";
+}
+
+export interface CtopModelRouting {
+  model: string;
+  useFor: string[];
+  avoidFor: string[];
+  rationale: string;
+}
+
+export interface CtopBudgetGuardrail {
+  name: string;
+  rule: string;
+  threshold?: string;
+  action: string;
+}
+
+export interface CtopFreePreview {
+  protocol: "CTOP";
+  access: "free_preview";
+  proFeature: true;
+  riskLevel: string;
+  currentTokensRange: Range;
+  estimatedSavingsPercent: { low: number; high: number };
+  topActionsPreview: Array<{ name: string; action: string }>;
+  lockedSections: string[];
+  upgradeMessage: string;
+  recommendedNextAction: string;
+  meta: { generated_at: string; costpassport_version: string };
+}
+
+/** Full Pro report — returned by the Pro engine, not available in public CLI */
+export interface CtopProReport {
+  protocol: "CTOP";
+  access: "pro";
+  version: "1.0";
+  riskLevel: string;
+  currentTokensRange: Range;
+  optimizedTokensRange: Range;
+  estimatedSavings: {
+    percent: { low: number; high: number };
+    USD: { low: number; high: number };
+    EUR: { low: number; high: number };
+    XOF: { low: number; high: number };
+  };
+  topActions: CtopAction[];
+  contextDecisions: ContextElement[];
+  modelRouting: CtopModelRouting[];
+  promptCachingStrategy: string[];
+  buildPhases: string[];
+  budgetGuardrails: CtopBudgetGuardrail[];
+  /** Present only when --write was used */
+  promptPackFiles?: string[];
+  recommendedNextAction: string;
+  disclaimer: string;
+  meta: { generated_at: string; costpassport_version: string };
+}
+
+export type CtopReport = CtopFreePreview | CtopProReport;

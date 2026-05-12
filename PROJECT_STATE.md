@@ -67,6 +67,16 @@
 - tsconfig.json updated to include `tests/**/*`.
 - `vitest.config.ts` created.
 
+### CTOP Public Preview ✅ (post-v0.3.0, no version bump) — D-028, D-029
+- `costpassport optimize` command added — free preview. ✅
+- Output: riskLevel, estimatedSavingsPercent, top 3 actions, 7 locked sections, upgrade message. ✅
+- `--write` blocked in public build with clear message. ✅
+- Advanced optimization features reserved for a future Pro version. ✅
+- `.npmignore` created — excludes source files and private assets from tarball. ✅
+- `.gitignore` hardened — private asset patterns added. ✅
+- Bundle: 92.18 KB, 0 warnings. Tarball: 10 files, 28.2 KB. ✅
+- Tests: 42/42 ✅
+
 ## Next — v0.4.0
 - OpenAI / Gemini provider support (provider abstraction)
 - `--provider` flag on estimate

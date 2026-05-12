@@ -42,6 +42,15 @@
 - FX chain, scoring coherence, readiness decisions, resolver fallback, ECB failure
 - Safe for CI: fs mocked, no real cache touched, no network calls
 
+## v0.3.x — CTOP Public Preview (post-publish, no version bump)
+- `costpassport optimize` — free preview: risk level, savings estimate, 3 generic actions, 7 locked sections
+- Advanced optimization features are planned for a future Pro version
+
+## CostPassport Pro (not yet released)
+- Full CTOP report with advanced prioritized optimization recommendations
+- Advanced preparation assets (--write)
+- Requires real licensing — Pro version coming soon
+
 ## v0.4.0 — Plugin Claude Code
 - Skill `/costpassport:preflight` — analyzes brief before build, checks budget, lists risks
 - Skill `/costpassport:doctor` — quick diagnosis in session
