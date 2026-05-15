@@ -6,7 +6,7 @@ import type {
   ReadinessReport,
 } from "../types.js";
 
-const VERSION = "0.4.0";
+const VERSION = "0.4.1";
 
 // ─── Fuzzy point detection ────────────────────────────────────────────────────
 
