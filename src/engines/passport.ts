@@ -20,7 +20,7 @@ import type {
   ScenarioName,
 } from "../types.js";
 
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 
 const LOCKED_PRO_SECTIONS: string[] = [
   "Full AI Work Contract",
