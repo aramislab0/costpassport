@@ -1,13 +1,13 @@
 # Private — never commit, never push
 private/
+confidential/
+confidential-assets/
+sensitive/
+*_PRIVATE*
+*_CONFIDENTIAL*
 
 # Claude Code local session data
 .claude/
-docs/brevet/
-docs/patent/
-CTOP_PRIVATE*
-PATENT*
-INVENTION*
 
 # Build
 dist/

@@ -325,3 +325,53 @@ export interface CtopProReport {
 }
 
 export type CtopReport = CtopFreePreview | CtopProReport;
+
+// ─── AI Work Passport ─────────────────────────────────────────────────────────
+
+export type PassportRiskLevel = "Low" | "Low-medium" | "Medium" | "Medium-high" | "High";
+
+export interface PassportRiskScores {
+  costRisk: PassportRiskLevel;
+  scopeRisk: PassportRiskLevel;
+  contextWasteRisk: PassportRiskLevel;
+  qualityRisk: PassportRiskLevel;
+  overallRisk: PassportRiskLevel;
+}
+
+export interface PassportReadiness {
+  decision: ReadinessDecision;
+  buildDecision: string;
+  score: number;
+  confidence: Confidence;
+}
+
+export interface PassportCost {
+  standard: { usd: Range; eur: Range; xof: Range };
+  economy: { usd: Range; eur: Range; xof: Range };
+  premium: { usd: Range; eur: Range; xof: Range };
+  savingsOpportunity: {
+    minPercent: number;
+    maxPercent: number;
+    usd: MoneyRange;
+    eur: MoneyRange;
+    xof: MoneyRange;
+  };
+}
+
+export interface PassportReport {
+  risks: PassportRiskScores;
+  readiness: PassportReadiness;
+  cost: PassportCost;
+  topCostDrivers: string[];
+  mainTokenLeaks: string[];
+  priorityActions: string[];
+  suggestedBuildStrategy: string[];
+  lockedProSections: string[];
+  assumptions: string[];
+  disclaimer: string;
+  meta: {
+    generated_at: string;
+    costpassport_version: string;
+    pricing_verified_at: string;
+  };
+}

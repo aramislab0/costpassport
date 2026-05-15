@@ -77,6 +77,17 @@
 - Bundle: 92.18 KB, 0 warnings. Tarball: 10 files, 28.2 KB. ✅
 - Tests: 42/42 ✅
 
+### AI Work Passport ✅ (post-v0.3.0, no version bump) — D-030
+- `costpassport passport` command added ✅
+- 4 risk dimensions: costRisk, scopeRisk, contextWasteRisk, qualityRisk → overallRisk ✅
+- Orchestrates estimate(), readiness(), tokenDoctor(), savingsReport() ✅
+- Output: markdown (default) | json — --live, --sources, --output flags ✅
+- 4 locked Pro sections: Full AI Work Contract, Stop-Loss Rules, Client-Safe Report, Compare Estimated vs Actual ✅
+- New files: src/lib/passport-risk.ts, src/engines/passport.ts, src/templates/passport-report.ts, src/commands/passport.ts ✅
+- Build: 106.60 KB, 0 warnings ✅
+- Tests: 42/42 ✅
+- Security grep: clean ✅
+
 ## Next — v0.4.0
 - OpenAI / Gemini provider support (provider abstraction)
 - `--provider` flag on estimate

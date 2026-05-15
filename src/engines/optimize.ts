@@ -128,7 +128,7 @@ export function optimize(opts: OptimizeOptions): CtopReport {
     topActionsPreview: genericActions(text, flags),
     lockedSections: [
       "Full optimization action list with scored priorities",
-      "Context decision matrix (12-element CTOP classification)",
+      "Advanced project optimization review",
       "Model routing guide (Haiku / Sonnet / Opus task assignment)",
       "Prompt caching implementation strategy",
       "Build phase sequencing",

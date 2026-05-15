@@ -1,5 +1,21 @@
 # Architecture Decisions
 
+## D-030 · AI Work Passport command — 2026-05-15
+New command: `costpassport passport` — unified report from all 4 public engines.
+Input: project brief (--brief file or stdin) + standard BriefFlags.
+Output: markdown (default) | json. Flags: --live, --sources, --output.
+Architecture: orchestrator pattern — calls estimate(), readiness(), tokenDoctor(), savingsReport() sequentially.
+Risk derivation: 4 dimensions (costRisk, scopeRisk, contextWasteRisk, qualityRisk) → overallRisk.
+  costRisk: Standard scenario USD high-end cost bracket.
+  scopeRisk: tokenWasteRisk (Low/Medium/High) combined with fuzzy point count.
+  contextWasteRisk: direct mapping from tokenBloatRisk (6-tier → 5-tier).
+  qualityRisk: confidence level combined with missingContext count.
+Double estimate() call accepted (savingsReport() calls estimate() internally) — refactor in v0.5.0.
+lockedProSections (4): Full AI Work Contract, Stop-Loss Rules, Client-Safe Report, Compare Estimated vs Actual.
+"Ready to build" message override: "Ready to run with guardrails — start with a scoped first phase and monitor cost."
+New files: src/lib/passport-risk.ts, src/engines/passport.ts, src/templates/passport-report.ts, src/commands/passport.ts.
+No version bump. No npm publish. No CTOP Pro exposure.
+
 ## D-029 · Keep CTOP Pro engine out of public distribution — 2026-05-12
 The advanced optimization features of CTOP are commercially sensitive and reserved for a future Pro version.
 Decision: public CLI exposes free preview only (risk level, savings estimate, 3 generic actions, locked sections).

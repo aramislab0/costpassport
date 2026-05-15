@@ -1,6 +1,13 @@
 # Private — never publish
 private/
-private/ctop-prototype/
+confidential/
+confidential-assets/
+sensitive/
+*_PRIVATE*
+*_CONFIDENTIAL*
+
+# Claude Code local session data
+.claude/
 
 # Local optimization output (project-specific, not part of CLI package)
 .costpassport/
@@ -10,13 +17,6 @@ private/ctop-prototype/
 *.key
 .env
 .env.*
-
-# Patent and legal docs (do not disclose before filing)
-docs/brevet/
-docs/patent/
-CTOP_PRIVATE*
-PATENT*
-INVENTION*
 
 # Dev artefacts
 tests/

@@ -46,6 +46,13 @@
 - `costpassport optimize` — free preview: risk level, savings estimate, 3 generic actions, 7 locked sections
 - Advanced optimization features are planned for a future Pro version
 
+## v0.3.x — AI Work Passport (post-publish, no version bump)
+- `costpassport passport --brief brief.md --live --sources`
+- 4 risk dimensions: costRisk, scopeRisk, contextWasteRisk, qualityRisk → overallRisk
+- Orchestrates all 4 public engines in a single unified report
+- Output: markdown (default) | json — flags: --live, --sources, --output
+- 4 locked Pro sections: Full AI Work Contract, Stop-Loss Rules, Client-Safe Report, Compare Estimated vs Actual
+
 ## CostPassport Pro (not yet released)
 - Full CTOP report with advanced prioritized optimization recommendations
 - Advanced preparation assets (--write)
