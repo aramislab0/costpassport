@@ -1,12 +1,12 @@
 import type { MoneyRange, SavingsLever, SavingsReport } from "../types.js";
 import type { SourceMetadata } from "../lib/source-metadata.js";
 import { formatSourcesMarkdown } from "../lib/source-metadata.js";
+import type { CurrencyCode } from "../lib/currencies.js";
+import { DEFAULT_CURRENCIES, convertUsd, formatCurrencyAmount } from "../lib/currencies.js";
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
 
 function fmtUSD(n: number): string { return "$" + Math.round(n).toLocaleString("en-US"); }
-function fmtEUR(n: number): string { return "€" + Math.round(n).toLocaleString("en-US"); }
-function fmtXOF(n: number): string { return Math.round(n).toLocaleString("fr-FR"); }
 
 function fmtMoneyRange(r: MoneyRange, fmt: (n: number) => string): string {
   return `${fmt(r.min)} – ${fmt(r.max)}`;
@@ -23,7 +23,13 @@ function impactTag(lever: SavingsLever): string {
 
 // ─── Main renderer ────────────────────────────────────────────────────────────
 
-export function renderSavingsReport(report: SavingsReport, sources?: SourceMetadata): string {
+export function renderSavingsReport(
+  report: SavingsReport,
+  selectedCurrencies: readonly CurrencyCode[] = DEFAULT_CURRENCIES,
+  usdToEur = 0.92,
+  ecbRates: Record<string, number> = {},
+  sources?: SourceMetadata,
+): string {
   const lines: string[] = [];
 
   // Header
@@ -52,9 +58,40 @@ export function renderSavingsReport(report: SavingsReport, sources?: SourceMetad
   lines.push("");
   lines.push("| | Current (Standard) | Optimized |");
   lines.push("|---|---|---|");
-  lines.push(`| USD | ${fmtMoneyRange(report.currentCost.usd, fmtUSD)} | ${fmtMoneyRange(report.optimizedCost.usd, fmtUSD)} |`);
-  lines.push(`| EUR | ${fmtMoneyRange(report.currentCost.eur, fmtEUR)} | ${fmtMoneyRange(report.optimizedCost.eur, fmtEUR)} |`);
-  lines.push(`| XOF | ${fmtMoneyRange(report.currentCost.xof, fmtXOF)} | ${fmtMoneyRange(report.optimizedCost.xof, fmtXOF)} |`);
+
+  for (const currency of selectedCurrencies) {
+    let currentMin: number;
+    let currentMax: number;
+    let optimizedMin: number;
+    let optimizedMax: number;
+
+    if (currency === "USD") {
+      currentMin = report.currentCost.usd.min;
+      currentMax = report.currentCost.usd.max;
+      optimizedMin = report.optimizedCost.usd.min;
+      optimizedMax = report.optimizedCost.usd.max;
+    } else if (currency === "EUR") {
+      currentMin = report.currentCost.eur.min;
+      currentMax = report.currentCost.eur.max;
+      optimizedMin = report.optimizedCost.eur.min;
+      optimizedMax = report.optimizedCost.eur.max;
+    } else if (currency === "XOF") {
+      currentMin = report.currentCost.xof.min;
+      currentMax = report.currentCost.xof.max;
+      optimizedMin = report.optimizedCost.xof.min;
+      optimizedMax = report.optimizedCost.xof.max;
+    } else {
+      currentMin = convertUsd(report.currentCost.usd.min, currency, usdToEur, ecbRates);
+      currentMax = convertUsd(report.currentCost.usd.max, currency, usdToEur, ecbRates);
+      optimizedMin = convertUsd(report.optimizedCost.usd.min, currency, usdToEur, ecbRates);
+      optimizedMax = convertUsd(report.optimizedCost.usd.max, currency, usdToEur, ecbRates);
+    }
+
+    const fmtCurrent = `${formatCurrencyAmount(currentMin, currency)} – ${formatCurrencyAmount(currentMax, currency)}`;
+    const fmtOptimized = `${formatCurrencyAmount(optimizedMin, currency)} – ${formatCurrencyAmount(optimizedMax, currency)}`;
+    lines.push(`| ${currency} | ${fmtCurrent} | ${fmtOptimized} |`);
+  }
+
   lines.push("");
   lines.push("> Optimized cost assumes all savings levers below are applied.");
   lines.push("");
@@ -66,9 +103,28 @@ export function renderSavingsReport(report: SavingsReport, sources?: SourceMetad
   lines.push("");
   lines.push("| Currency | Min savings | Max savings |");
   lines.push("|---|---|---|");
-  lines.push(`| USD | ${fmtUSD(report.potentialSavings.usd.min)} | ${fmtUSD(report.potentialSavings.usd.max)} |`);
-  lines.push(`| EUR | ${fmtEUR(report.potentialSavings.eur.min)} | ${fmtEUR(report.potentialSavings.eur.max)} |`);
-  lines.push(`| XOF | ${fmtXOF(report.potentialSavings.xof.min)} | ${fmtXOF(report.potentialSavings.xof.max)} |`);
+
+  for (const currency of selectedCurrencies) {
+    let savMin: number;
+    let savMax: number;
+
+    if (currency === "USD") {
+      savMin = report.potentialSavings.usd.min;
+      savMax = report.potentialSavings.usd.max;
+    } else if (currency === "EUR") {
+      savMin = report.potentialSavings.eur.min;
+      savMax = report.potentialSavings.eur.max;
+    } else if (currency === "XOF") {
+      savMin = report.potentialSavings.xof.min;
+      savMax = report.potentialSavings.xof.max;
+    } else {
+      savMin = convertUsd(report.potentialSavings.usd.min, currency, usdToEur, ecbRates);
+      savMax = convertUsd(report.potentialSavings.usd.max, currency, usdToEur, ecbRates);
+    }
+
+    lines.push(`| ${currency} | ${formatCurrencyAmount(savMin, currency)} | ${formatCurrencyAmount(savMax, currency)} |`);
+  }
+
   lines.push(`| Rate | ${report.potentialSavings.minPercent}% | ${report.potentialSavings.maxPercent}% |`);
   lines.push("");
   lines.push("---");

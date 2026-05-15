@@ -60,6 +60,7 @@ interface CacheV1 {
       EUR_TO_XOF: number;
       USD_TO_XOF: number;
     };
+    ecb_rates?: Record<string, number>;
   };
   warnings: string[];
 }
@@ -123,6 +124,11 @@ function cacheV1ToFxTable(cache: CacheV1): FxTable {
       EUR: cache.fx.rates.USD_TO_EUR,
       XOF_PER_EUR: cache.fx.rates.EUR_TO_XOF,
     },
+    // Use cache ecb_rates if present; fall back to bundled rates so non-USD/EUR/XOF
+    // currencies always have conversion data even when the cache predates multi-currency.
+    ecbRates: (cache.fx.ecb_rates && Object.keys(cache.fx.ecb_rates).length > 0)
+      ? cache.fx.ecb_rates
+      : (fxBundled as unknown as FxTable).ecbRates,
     last_updated: cache.fx.verified_at,
     mode: "ecb-live",
     warning: cache.warnings.slice(0, 2).join(" "),

@@ -4,8 +4,24 @@
     "EUR": 0.92,
     "XOF_PER_EUR": 655.957
   },
-  "last_updated": "2026-05-10",
+  "ecbRates": {
+    "USD": 1.0870,
+    "JPY": 164.00,
+    "GBP": 0.8448,
+    "CNY": 7.8000,
+    "AUD": 1.6500,
+    "CAD": 1.4700,
+    "CHF": 0.9400,
+    "HKD": 8.4700,
+    "SGD": 1.4400,
+    "SEK": 11.1000,
+    "KRW": 1530.00,
+    "NOK": 11.7000,
+    "NZD": 1.7900,
+    "MXN": 20.5000
+  },
+  "last_updated": "2026-05-15",
   "mode": "static",
-  "warning": "Static FX rates. Verify USD/EUR before commercial or client billing use. XOF/EUR peg is fixed by CFA franc convention.",
-  "usd_eur_note": "Update rates field EUR value periodically. Suggested source: ECB reference rates."
+  "warning": "Bundled fallback rates. Run `costpassport pricing:update` to refresh from ECB.",
+  "usd_eur_note": "Update rates.EUR periodically. ecbRates are EUR_TO_XXX from ECB eurofxref."
 }

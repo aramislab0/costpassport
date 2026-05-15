@@ -1,6 +1,8 @@
 import type { Estimate, ScenarioName } from "../types.js";
 import type { SourceMetadata } from "../lib/source-metadata.js";
 import { formatSourcesMarkdown } from "../lib/source-metadata.js";
+import type { CurrencyCode } from "../lib/currencies.js";
+import { formatUsdRange, DEFAULT_CURRENCIES } from "../lib/currencies.js";
 
 function riskLevel(score: number): string {
   if (score >= 70) return "Low";
@@ -16,18 +18,6 @@ function fmtM(n: number): string {
 
 function fmtRange(low: number, high: number, fmt: (n: number) => string): string {
   return `${fmt(low)} – ${fmt(high)}`;
-}
-
-function fmtUSD(n: number): string {
-  return "$" + Math.round(n).toLocaleString("en-US");
-}
-
-function fmtEUR(n: number): string {
-  return "€" + Math.round(n).toLocaleString("en-US");
-}
-
-function fmtXOF(n: number): string {
-  return Math.round(n).toLocaleString("fr-FR");
 }
 
 function fmtConfidence(c: string): string {
@@ -67,7 +57,13 @@ const SCENARIO_DESC: Record<ScenarioName, string> = {
 
 // ─── Main renderer ───────────────────────────────────────────────────────────
 
-export function renderPassport(estimate: Estimate, sources?: SourceMetadata): string {
+export function renderPassport(
+  estimate: Estimate,
+  selectedCurrencies: readonly CurrencyCode[] = DEFAULT_CURRENCIES,
+  usdToEur = 0.92,
+  ecbRates: Record<string, number> = {},
+  sources?: SourceMetadata,
+): string {
   const score = estimate.costReadinessScore.score;
   const risk = riskLevel(score);
   const action = recommendedAction(estimate, score);
@@ -103,15 +99,18 @@ export function renderPassport(estimate: Estimate, sources?: SourceMetadata): st
   // Estimated AI build cost
   lines.push("## Estimated AI Build Cost");
   lines.push("");
-  lines.push("| Scenario | Model Mix | USD | EUR | XOF |");
-  lines.push("|---|---|---|---|---|");
+  const currencyHeaders = selectedCurrencies.join(" | ");
+  lines.push(`| Scenario | Model Mix | ${currencyHeaders} |`);
+  lines.push(`|---|---|${"---|".repeat(selectedCurrencies.length)}`);
 
   for (const name of ["economy", "standard", "premium"] as ScenarioName[]) {
     const s = estimate.scenarios[name];
-    const usd = fmtRange(s.cost.USD.low, s.cost.USD.high, fmtUSD);
-    const eur = fmtRange(s.cost.EUR.low, s.cost.EUR.high, fmtEUR);
-    const xof = fmtRange(s.cost.XOF.low, s.cost.XOF.high, fmtXOF);
-    lines.push(`| **${SCENARIO_LABEL[name]}** | ${SCENARIO_DESC[name]} | ${usd} | ${eur} | ${xof} |`);
+    const usdLow = s.cost.USD.low;
+    const usdHigh = s.cost.USD.high;
+    const currencyCols = selectedCurrencies
+      .map(currency => formatUsdRange(usdLow, usdHigh, currency, usdToEur, ecbRates))
+      .join(" | ");
+    lines.push(`| **${SCENARIO_LABEL[name]}** | ${SCENARIO_DESC[name]} | ${currencyCols} |`);
   }
 
   lines.push("");

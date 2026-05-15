@@ -195,6 +195,8 @@ export interface FxTable {
     EUR: number;
     XOF_PER_EUR: number;
   };
+  /** EUR_TO_XXX rates from ECB XML (e.g. ecbRates["JPY"] = 163.84) */
+  ecbRates?: Record<string, number>;
   last_updated: string;
   mode: string;
   warning: string;

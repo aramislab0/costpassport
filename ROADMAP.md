@@ -58,18 +58,26 @@
 - Advanced preparation assets (--write)
 - Requires real licensing — Pro version coming soon
 
-## v0.4.0 — Plugin Claude Code
+## v0.4.0 — AI Work Passport + Multi-currency ✅ Published
+- `costpassport passport` — unified cost + risk + readiness report in one command
+- 4 risk dimensions: costRisk, scopeRisk, contextWasteRisk, qualityRisk → overallRisk
+- Multi-currency: 16 currencies supported; USD/EUR/JPY default (BIS top-traded)
+- XOF available via `--currency XOF`, no longer shown by default
+- Flags: `--currency <code>`, `--currencies <codes>`, `--all-currencies`
+- ECB rates bundled for all 15 major currencies; refreshed with `--live`
+
+## v0.5.0 — Plugin Claude Code
 - Skill `/costpassport:preflight` — analyzes brief before build, checks budget, lists risks
 - Skill `/costpassport:doctor` — quick diagnosis in session
 - Skill `/costpassport:savings` — savings report in session
 - Built on existing engines, no duplication
 
-## v0.5.0 — compare: estimated vs actual
+## v0.6.0 — compare: estimated vs actual
 - `costpassport usage:import` — parses Claude Code / Cursor / Anthropic console exports
 - `costpassport compare` — estimated vs actual delta + probable cause
 - Local history in `~/.costpassport/history/`
 
-## v0.6.0 — budget-guard
+## v0.7.0 — budget-guard
 - `costpassport budget-guard --brief brief.md --max-usd 100`
 - within budget / over budget decision
 - Scope reduction recommendations if over budget

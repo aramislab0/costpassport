@@ -8,6 +8,8 @@
 import type { PassportReport, PassportRiskLevel } from "../types.js";
 import type { SourceMetadata } from "../lib/source-metadata.js";
 import { formatSourcesMarkdown } from "../lib/source-metadata.js";
+import type { CurrencyCode } from "../lib/currencies.js";
+import { DEFAULT_CURRENCIES, convertUsd, formatCurrencyAmount } from "../lib/currencies.js";
 
 // ─── Risk formatting ──────────────────────────────────────────────────────────
 
@@ -29,26 +31,13 @@ function fmtUSD(n: number): string {
   return "$" + Math.round(n).toLocaleString("en-US");
 }
 
-function fmtEUR(n: number): string {
-  return "€" + Math.round(n).toLocaleString("en-US");
-}
-
-function fmtXOF(n: number): string {
-  return Math.round(n).toLocaleString("fr-FR") + " XOF";
-}
-
-function fmtRange(
-  low: number,
-  high: number,
-  fmt: (n: number) => string,
-): string {
-  return `${fmt(low)} – ${fmt(high)}`;
-}
-
 // ─── Main renderer ────────────────────────────────────────────────────────────
 
 export function renderPassportReport(
   report: PassportReport,
+  selectedCurrencies: readonly CurrencyCode[] = DEFAULT_CURRENCIES,
+  usdToEur = 0.92,
+  ecbRates: Record<string, number> = {},
   sources?: SourceMetadata,
 ): string {
   const lines: string[] = [];
@@ -95,13 +84,41 @@ export function renderPassportReport(
   // ── AI Build Cost ──────────────────────────────────────────────────────────
   lines.push("## AI Build Cost");
   lines.push("");
-  lines.push("| Scenario | USD | EUR | XOF |");
-  lines.push("|---|---|---|---|");
+  const currencyHeaders = selectedCurrencies.join(" | ");
+  lines.push(`| Scenario | ${currencyHeaders} |`);
+  lines.push(`|---|${"---|".repeat(selectedCurrencies.length)}`);
 
   const { economy, standard, premium } = report.cost;
-  lines.push(`| Economy | ${fmtRange(economy.usd.low, economy.usd.high, fmtUSD)} | ${fmtRange(economy.eur.low, economy.eur.high, fmtEUR)} | ${fmtRange(economy.xof.low, economy.xof.high, fmtXOF)} |`);
-  lines.push(`| **Standard** *(recommended)* | **${fmtRange(standard.usd.low, standard.usd.high, fmtUSD)}** | **${fmtRange(standard.eur.low, standard.eur.high, fmtEUR)}** | **${fmtRange(standard.xof.low, standard.xof.high, fmtXOF)}** |`);
-  lines.push(`| Premium | ${fmtRange(premium.usd.low, premium.usd.high, fmtUSD)} | ${fmtRange(premium.eur.low, premium.eur.high, fmtEUR)} | ${fmtRange(premium.xof.low, premium.xof.high, fmtXOF)} |`);
+
+  function fmtScenarioRow(
+    label: string,
+    usdLow: number,
+    usdHigh: number,
+    eurLow: number,
+    eurHigh: number,
+    xofLow: number,
+    xofHigh: number,
+    bold = false,
+  ): string {
+    const cols = selectedCurrencies.map(currency => {
+      let low: number;
+      let high: number;
+      if (currency === "USD") { low = usdLow; high = usdHigh; }
+      else if (currency === "EUR") { low = eurLow; high = eurHigh; }
+      else if (currency === "XOF") { low = xofLow; high = xofHigh; }
+      else {
+        low = convertUsd(usdLow, currency, usdToEur, ecbRates);
+        high = convertUsd(usdHigh, currency, usdToEur, ecbRates);
+      }
+      const formatted = `${formatCurrencyAmount(low, currency)} – ${formatCurrencyAmount(high, currency)}`;
+      return bold ? `**${formatted}**` : formatted;
+    });
+    return `| ${label} | ${cols.join(" | ")} |`;
+  }
+
+  lines.push(fmtScenarioRow("Economy", economy.usd.low, economy.usd.high, economy.eur.low, economy.eur.high, economy.xof.low, economy.xof.high));
+  lines.push(fmtScenarioRow("**Standard** *(recommended)*", standard.usd.low, standard.usd.high, standard.eur.low, standard.eur.high, standard.xof.low, standard.xof.high, true));
+  lines.push(fmtScenarioRow("Premium", premium.usd.low, premium.usd.high, premium.eur.low, premium.eur.high, premium.xof.low, premium.xof.high));
 
   lines.push("");
   lines.push("### Savings Opportunity");
@@ -109,8 +126,20 @@ export function renderPassportReport(
   const sav = report.cost.savingsOpportunity;
   lines.push(`- Potential savings: **${sav.minPercent}–${sav.maxPercent}%**`);
   lines.push(`- In USD: ${fmtUSD(sav.usd.min)} – ${fmtUSD(sav.usd.max)}`);
-  lines.push(`- In EUR: ${fmtEUR(sav.eur.min)} – ${fmtEUR(sav.eur.max)}`);
-  lines.push(`- In XOF: ${fmtXOF(sav.xof.min)} – ${fmtXOF(sav.xof.max)}`);
+
+  for (const currency of selectedCurrencies) {
+    if (currency === "USD") continue; // already shown above
+    let savMin: number;
+    let savMax: number;
+    if (currency === "EUR") { savMin = sav.eur.min; savMax = sav.eur.max; }
+    else if (currency === "XOF") { savMin = sav.xof.min; savMax = sav.xof.max; }
+    else {
+      savMin = convertUsd(sav.usd.min, currency, usdToEur, ecbRates);
+      savMax = convertUsd(sav.usd.max, currency, usdToEur, ecbRates);
+    }
+    lines.push(`- In ${currency}: ${formatCurrencyAmount(savMin, currency)} – ${formatCurrencyAmount(savMax, currency)}`);
+  }
+
   lines.push("");
   lines.push("---");
   lines.push("");

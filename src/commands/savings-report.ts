@@ -4,6 +4,8 @@ import { savingsReport } from "../engines/savings.js";
 import { runPricingUpdate } from "../engines/pricing-update.js";
 import { renderSavingsReport } from "../templates/savings-report.js";
 import { getSourceMetadata } from "../lib/source-metadata.js";
+import { resolveCurrencies } from "../lib/currencies.js";
+import { resolveCostData } from "../data/resolver.js";
 import type { BriefFlags } from "../types.js";
 
 async function readStdin(): Promise<string> {
@@ -31,6 +33,9 @@ export function registerSavingsReportCommand(program: Command): void {
     .option("--format <format>", "Output format: json | markdown", "json")
     .option("--sources", "Show data sources, FX rates and freshness metadata", false)
     .option("--live", "Fetch latest FX rates from ECB before calculating", false)
+    .option("--currency <code>", "Add a currency to the default output (e.g. XOF, GBP)")
+    .option("--currencies <codes>", "Show only specific currencies (e.g. USD,EUR,XOF)")
+    .option("--all-currencies", "Show all supported currencies", false)
     .action(async (opts: {
       brief?: string;
       path?: string;
@@ -45,6 +50,9 @@ export function registerSavingsReportCommand(program: Command): void {
       format: string;
       sources: boolean;
       live: boolean;
+      currency?: string;
+      currencies?: string;
+      allCurrencies: boolean;
     }) => {
       let text: string;
 
@@ -84,11 +92,25 @@ export function registerSavingsReportCommand(program: Command): void {
         legacy: opts.legacy,
       };
 
+      const { currencies: selectedCurrencies, error: currencyError } = resolveCurrencies({
+        currency: opts.currency,
+        currencies: opts.currencies,
+        allCurrencies: opts.allCurrencies,
+      });
+      if (currencyError) {
+        process.stderr.write(`[costpassport] ${currencyError}\n`);
+        process.exit(1);
+      }
+
+      const { fx } = resolveCostData();
+      const usdToEur = fx.rates.EUR;
+      const ecbRates = fx.ecbRates ?? {};
+
       const report = savingsReport({ text, flags, projectPath: opts.path });
 
       if (opts.format === "markdown") {
         const sourceMeta = opts.sources ? getSourceMetadata(liveResult) : undefined;
-        process.stdout.write(renderSavingsReport(report, sourceMeta) + "\n");
+        process.stdout.write(renderSavingsReport(report, selectedCurrencies, usdToEur, ecbRates, sourceMeta) + "\n");
       } else {
         if (opts.sources) {
           const sourceMeta = getSourceMetadata(liveResult);

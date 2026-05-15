@@ -138,6 +138,29 @@ Pro features (not included in public CLI):
 
 ---
 
+## Multi-currency support
+
+Reports show **USD, EUR and JPY by default** — the three most-traded currencies globally (BIS ranking).
+
+16 currencies are supported in total. Control the output with three flags:
+
+```bash
+# Add a currency to the default USD/EUR/JPY output
+npx costpassport@latest passport --brief brief.md --currency XOF
+
+# Show only specific currencies
+npx costpassport@latest passport --brief brief.md --currencies USD,EUR,XOF
+
+# Show all 16 supported currencies
+npx costpassport@latest passport --brief brief.md --all-currencies
+```
+
+**Supported currencies:** USD, EUR, JPY, GBP, CNY, AUD, CAD, CHF, HKD, SGD, SEK, KRW, NOK, NZD, MXN, XOF
+
+XOF uses the BCEAO fixed peg (1 EUR = 655.957 XOF). All other currencies use ECB exchange rates — bundled by default, refreshed with `--live` or `pricing:update`.
+
+---
+
 ## Live sources and local cache
 
 CostPassport uses verifiable data for pricing and FX rates.

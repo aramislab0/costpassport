@@ -37,8 +37,8 @@ npx costpassport --help
 - Local-first: no project data leaves your machine
 - No CTOP Pro logic in the public package
 - No sensitive files in the npm tarball
-- Supports: USD / EUR / XOF · Economy / Standard / Premium scenarios
-- Flags: `--live` (ECB FX), `--sources` (data provenance), `--output` (write to file)
+- Supports: 16 currencies (USD / EUR / JPY default; XOF + 12 more via flags) · Economy / Standard / Premium scenarios
+- Flags: `--live` (ECB FX), `--sources` (data provenance), `--output` (write to file), `--currency`, `--currencies`, `--all-currencies`
 
 ---
 
@@ -50,6 +50,7 @@ npx costpassport --help
 - **v0.3.0** — `--live` flag for inline ECB FX fetch
 - **v0.3.x** — Automated test suite (42 tests), `optimize` free preview
 - **v0.4.0** — AI Work Passport: `costpassport passport`
+- **v0.4.0 (post-publish)** — Multi-currency: 16 currencies, USD/EUR/JPY default, `--currency`/`--currencies`/`--all-currencies` flags
 
 ---
 

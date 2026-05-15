@@ -13,6 +13,8 @@ import { passport } from "../engines/passport.js";
 import { runPricingUpdate } from "../engines/pricing-update.js";
 import { renderPassportReport } from "../templates/passport-report.js";
 import { getSourceMetadata } from "../lib/source-metadata.js";
+import { resolveCurrencies } from "../lib/currencies.js";
+import { resolveCostData } from "../data/resolver.js";
 import type { BriefFlags } from "../types.js";
 
 async function readStdin(): Promise<string> {
@@ -40,6 +42,9 @@ export function registerPassportCommand(program: Command): void {
     .option("--i18n", "Includes multi-language support", false)
     .option("--refactor", "Refactoring existing codebase", false)
     .option("--legacy", "Legacy codebase involved", false)
+    .option("--currency <code>", "Add a currency to the default output (e.g. XOF, GBP)")
+    .option("--currencies <codes>", "Show only specific currencies (e.g. USD,EUR,XOF)")
+    .option("--all-currencies", "Show all supported currencies", false)
     .action(async (opts: {
       brief?: string;
       format: string;
@@ -54,6 +59,9 @@ export function registerPassportCommand(program: Command): void {
       i18n: boolean;
       refactor: boolean;
       legacy: boolean;
+      currency?: string;
+      currencies?: string;
+      allCurrencies: boolean;
     }) => {
       let text: string;
 
@@ -98,6 +106,20 @@ export function registerPassportCommand(program: Command): void {
         legacy: opts.legacy,
       };
 
+      const { currencies: selectedCurrencies, error: currencyError } = resolveCurrencies({
+        currency: opts.currency,
+        currencies: opts.currencies,
+        allCurrencies: opts.allCurrencies,
+      });
+      if (currencyError) {
+        process.stderr.write(`[costpassport] ${currencyError}\n`);
+        process.exit(1);
+      }
+
+      const { fx } = resolveCostData();
+      const usdToEur = fx.rates.EUR;
+      const ecbRates = fx.ecbRates ?? {};
+
       const result = passport({ text, flags });
 
       let output: string;
@@ -112,7 +134,7 @@ export function registerPassportCommand(program: Command): void {
       } else {
         // markdown (default)
         const sourceMeta = opts.sources ? getSourceMetadata(liveResult) : undefined;
-        output = renderPassportReport(result, sourceMeta);
+        output = renderPassportReport(result, selectedCurrencies, usdToEur, ecbRates, sourceMeta);
       }
 
       if (opts.output) {

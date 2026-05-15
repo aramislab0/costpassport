@@ -4,6 +4,8 @@ import { estimate } from "../engines/estimate.js";
 import { runPricingUpdate } from "../engines/pricing-update.js";
 import { renderPassport } from "../templates/passport.js";
 import { getSourceMetadata } from "../lib/source-metadata.js";
+import { resolveCurrencies } from "../lib/currencies.js";
+import { resolveCostData } from "../data/resolver.js";
 import type { BriefFlags } from "../types.js";
 
 async function readStdin(): Promise<string> {
@@ -30,6 +32,9 @@ export function registerEstimateCommand(program: Command): void {
     .option("--format <format>", "Output format: json | markdown | passport", "json")
     .option("--sources", "Show data sources, FX rates and freshness metadata", false)
     .option("--live", "Fetch latest FX rates from ECB before calculating", false)
+    .option("--currency <code>", "Add a currency to the default output (e.g. XOF, GBP)")
+    .option("--currencies <codes>", "Show only specific currencies (e.g. USD,EUR,XOF)")
+    .option("--all-currencies", "Show all supported currencies", false)
     .action(async (opts: {
       brief?: string;
       stack?: string;
@@ -43,6 +48,9 @@ export function registerEstimateCommand(program: Command): void {
       format: string;
       sources: boolean;
       live: boolean;
+      currency?: string;
+      currencies?: string;
+      allCurrencies: boolean;
     }) => {
       let text: string;
 
@@ -81,12 +89,26 @@ export function registerEstimateCommand(program: Command): void {
         legacy: opts.legacy,
       };
 
+      const { currencies: selectedCurrencies, error: currencyError } = resolveCurrencies({
+        currency: opts.currency,
+        currencies: opts.currencies,
+        allCurrencies: opts.allCurrencies,
+      });
+      if (currencyError) {
+        process.stderr.write(`[costpassport] ${currencyError}\n`);
+        process.exit(1);
+      }
+
+      const { fx } = resolveCostData();
+      const usdToEur = fx.rates.EUR;
+      const ecbRates = fx.ecbRates ?? {};
+
       const result = estimate({ text, flags });
       const isMarkdown = opts.format === "markdown" || opts.format === "passport";
 
       if (isMarkdown) {
         const sourceMeta = opts.sources ? getSourceMetadata(liveResult) : undefined;
-        process.stdout.write(renderPassport(result, sourceMeta) + "\n");
+        process.stdout.write(renderPassport(result, selectedCurrencies, usdToEur, ecbRates, sourceMeta) + "\n");
       } else {
         // JSON — without --sources output is unchanged; with --sources add sources field
         if (opts.sources) {

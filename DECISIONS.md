@@ -1,5 +1,17 @@
 # Architecture Decisions
 
+## D-031 · Multi-currency support — 2026-05-15
+Default currencies changed from USD/EUR/XOF to USD/EUR/JPY (BIS top-traded currencies).
+XOF stays supported but is no longer shown by default — available via `--currency XOF`.
+16 supported currencies total: 15 major (BIS-ranked) + XOF (BCEAO fixed peg).
+New file: src/lib/currencies.ts — CurrencyCode type, SUPPORTED_CURRENCIES, DEFAULT_CURRENCIES, convertUsd(), formatCurrencyAmount(), resolveCurrencies().
+CLI flags added to passport, estimate, savings-report: `--currency <code>`, `--currencies <codes>`, `--all-currencies`.
+Conversion formula: USD → EUR (FxTable.rates.EUR) → target (FxTable.ecbRates[target], EUR_TO_XXX from ECB).
+XOF uses BCEAO fixed peg: EUR_TO_XOF = 655.957 (never fetched from ECB).
+ecbRates stored in FxTable.ecbRates (optional); bundled in fx.json and populated by pricing:update.
+Resolver fix (D-031b): if cache lacks ecb_rates, fall back to bundled ecbRates so major currencies always convert correctly.
+No version bump. No npm publish.
+
 ## D-030 · AI Work Passport command — 2026-05-15
 New command: `costpassport passport` — unified report from all 4 public engines.
 Input: project brief (--brief file or stdin) + standard BriefFlags.

@@ -71,24 +71,27 @@ const ANTHROPIC_MODELS = {
 
 // ─── ECB fetch ────────────────────────────────────────────────────────────────
 
-/** Extracts EUR→USD rate from ECB eurofxref XML. Returns null on any parse failure.
+/** Extracts all EUR→XXX rates from ECB eurofxref XML. Returns null on any parse failure.
  *  ECB uses single-quoted attributes: currency='USD' rate='1.1765'
  *  Regex accepts both single and double quotes for resilience.
  */
-function parseEcbXml(xml: string): { eurToUsd: number; date: string } | null {
-  const rateMatch = xml.match(/currency=['"]USD['"]\s+rate=['"]([^'"]+)['"]/);
-  if (!rateMatch) return null;
-  const eurToUsd = parseFloat(rateMatch[1]);
-  if (isNaN(eurToUsd) || eurToUsd <= 0) return null;
-
+function parseEcbXml(xml: string): { eurToUsd: number; date: string; allRates: Record<string, number> } | null {
+  const allRates: Record<string, number> = {};
+  const rateRegex = /currency=['"]([A-Z]{3})['"]\s+rate=['"]([^'"]+)['"]/g;
+  let match;
+  while ((match = rateRegex.exec(xml)) !== null) {
+    const rate = parseFloat(match[2]);
+    if (!isNaN(rate) && rate > 0) allRates[match[1]] = rate;
+  }
+  if (!allRates["USD"]) return null;
   const dateMatch = xml.match(/time=['"](\d{4}-\d{2}-\d{2})['"]/);
   const date = dateMatch?.[1] ?? new Date().toISOString().slice(0, 10);
-
-  return { eurToUsd, date };
+  return { eurToUsd: allRates["USD"], date, allRates };
 }
 
 interface FxFetchResult {
   eurToUsd: number;
+  allRates: Record<string, number>;
   verifiedAt: string;
   live: boolean;
   error: string | null;
@@ -105,13 +108,14 @@ async function fetchEcbRate(): Promise<FxFetchResult> {
     const parsed = parseEcbXml(xml);
     if (!parsed) throw new Error("Could not extract USD rate from ECB XML");
 
-    return { eurToUsd: parsed.eurToUsd, verifiedAt: parsed.date, live: true, error: null };
+    return { eurToUsd: parsed.eurToUsd, allRates: parsed.allRates, verifiedAt: parsed.date, live: true, error: null };
   } catch (err) {
     // Graceful fallback: use bundled FX rates
     const fx = fxBundled as unknown as FxTable;
     const eurToUsd = Math.round((1 / fx.rates.EUR) * 10_000) / 10_000;
     return {
       eurToUsd,
+      allRates: {},
       verifiedAt: fx.last_updated,
       live: false,
       error: (err as Error).message,
@@ -140,7 +144,7 @@ export async function runPricingUpdate(): Promise<PricingUpdateResult> {
   // Ensure cache directory exists
   fs.mkdirSync(CACHE_DIR, { recursive: true });
 
-  const { eurToUsd, verifiedAt: fxVerifiedAt, live: fxLive, error: fxError } =
+  const { eurToUsd, allRates, verifiedAt: fxVerifiedAt, live: fxLive, error: fxError } =
     await fetchEcbRate();
 
   const usdToEur = Math.round((1 / eurToUsd) * 10_000) / 10_000;
@@ -179,6 +183,7 @@ export async function runPricingUpdate(): Promise<PricingUpdateResult> {
         EUR_TO_XOF: eurToXof,
         USD_TO_XOF: usdToXof,
       },
+      ecb_rates: allRates,
     },
     warnings,
   };
