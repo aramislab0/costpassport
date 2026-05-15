@@ -1,221 +1,211 @@
 # CostPassport
 
-**No more surprise AI bills.**
+**Before you run AI, run CostPassport.**
 
-Know your AI build cost before you start — before you open Claude Code, before you write a single line.
+Estimate cost, check readiness and generate an AI Work Passport before launching AI-assisted work.
 
 ```bash
-npx costpassport estimate
-cat brief.md | npx costpassport before-you-build
+npx costpassport@latest passport --brief brief.md --live --sources
 ```
 
----
-
-## What is CostPassport?
-
-CostPassport is a local CLI that analyzes your project brief and gives you a cost estimate, a readiness score, and a concrete action plan — before you burn tokens on a build that wasn't ready.
-
-It runs entirely on your machine. No data leaves your computer. No account required.
+[![npm version](https://img.shields.io/npm/v/costpassport.svg)](https://www.npmjs.com/package/costpassport)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## Why it exists
+## Why CostPassport
 
-AI coding agents (Claude Code, Cursor, Copilot) bill by the token. A vague brief, an undefined MVP scope, or a missing CLAUDE.md can quietly multiply your costs by 3–5×.
+AI coding agents bill by the token. A vague project brief, undefined MVP scope, missing roles, or noisy context can quietly multiply your costs by 3–5× before you realize it.
 
-CostPassport catches those issues in 10 seconds — before they cost you money.
+CostPassport works **one level earlier** than task-level tools:
 
----
+- Task-level tools estimate or track individual agent runs.
+- CostPassport operates at the **project level** — readiness, cost range, scope risks, and guardrails — before execution starts.
 
-## What it does
-
-| Command | What you get |
-|---|---|
-| `estimate` | Token + cost range in USD, EUR, and XOF across 3 models |
-| `before-you-build` | Readiness score, fuzzy point detection, build strategy |
-| `token-doctor` | Token leak diagnosis, context diet, optimization plan |
-| `savings-report` | Savings potential, ranked levers, priority actions |
+Run it in 10 seconds. Get a full pre-execution report. Start your AI work with your eyes open.
 
 ---
 
-## Install
+## Quick start
+
+No install required:
+
+```bash
+# The full pre-execution report
+npx costpassport@latest passport --brief brief.md --live --sources
+
+# Cost estimate only
+npx costpassport@latest estimate --brief brief.md
+
+# Build readiness check
+npx costpassport@latest before-you-build --brief brief.md
+
+# Token waste diagnosis
+npx costpassport@latest token-doctor --path .
+
+# Savings opportunity report
+npx costpassport@latest savings-report --brief brief.md
+
+# Refresh local pricing and FX cache
+npx costpassport@latest pricing:update
+```
+
+Requires Node.js ≥ 20.
+
+Or install globally:
 
 ```bash
 npm install -g costpassport
 ```
 
-Requires Node.js ≥ 20.
-
 ---
 
-## Quickstart
+## AI Work Passport
 
-### Estimate cost from a brief
+`costpassport passport` is the central command. It runs all analysis in one pass and returns a unified report covering cost, readiness, risk, and priority actions.
 
-```bash
-# Pipe your project brief
-cat my-brief.md | costpassport estimate
-
-# Get a formatted Markdown report
-cat my-brief.md | costpassport estimate --format passport
 ```
+# AI WORK PASSPORT
 
-### Check readiness before building
+Readiness:  75/100 — Needs clarification
+Decision:   Almost ready, but clarify the remaining risks before starting.
 
-```bash
-cat my-brief.md | costpassport before-you-build
-cat my-brief.md | costpassport before-you-build --format markdown
-```
+Estimated AI cost (Standard scenario):
+  USD  $21.60 – $57.60
+  EUR  €18.58 – €49.54
+  XOF  12,188 – 32,496 XOF
 
-### Diagnose token waste
+Savings opportunity: 15–25% if optimizations applied
 
-```bash
-# Brief only
-cat my-brief.md | costpassport token-doctor
+Risk overview:
+  💰 Budget risk:        Medium
+  📋 Scope risk:         High
+  🗃️ Context waste:      Medium
+  📝 Brief quality:      Medium
+  ──────────────────────────────
+  ⚠️  Overall risk:      High
 
-# Project directory only
-costpassport token-doctor --path ./my-project
+Top token leaks:
+  - Payment flow vague — rework is the most expensive iteration type
+  - Real-time features without architecture — doubles token cost on correction
+  - No MVP boundary defined — agent may implement everything
 
-# Both
-cat my-brief.md | costpassport token-doctor --path ./my-project
-```
+Priority actions:
+  1. Define payment provider and flow before build
+  2. Split MVP vs. full build explicitly
+  3. List what is NOT in v1 as clearly as what is
 
-### Get a savings report
+Recommended next action:
+  Do not launch full AI work yet. Clarify scope first.
 
-```bash
-cat my-brief.md | costpassport savings-report
-cat my-brief.md | costpassport savings-report --format markdown
+Pro features (not included in public CLI):
+  🔒 Full AI Work Contract
+  🔒 Stop-Loss Rules
+  🔒 Client-Safe Report
+  🔒 Compare Estimated vs Actual
 ```
 
 ---
 
 ## Commands
 
-### `estimate`
-
-Estimates token usage and cost for your project brief.
-
-```
-costpassport estimate [options]
-```
-
-| Flag | Description |
+| Command | What it does |
 |---|---|
-| `--format <type>` | Output format: `json` (default), `markdown`, `passport` |
-| `--payments` | Project involves payment processing |
-| `--mobile` | Project includes a mobile app |
-| `--realtime` | Project has real-time features (chat, live tracking) |
-| `--ai` | Project includes AI/LLM features |
-| `--i18n` | Project requires multi-language support |
-| `--stack <name>` | Force a specific tech stack label |
+| `passport` | Full AI Work Passport — cost, readiness, risks, actions in one report |
+| `estimate` | Token + cost range across Economy / Standard / Premium scenarios |
+| `before-you-build` | Readiness score, fuzzy point detection, suggested build strategy |
+| `token-doctor` | Token leak diagnosis, context diet, optimization plan |
+| `savings-report` | Savings potential and ranked optimization levers |
+| `pricing:update` | Refresh local FX rates from ECB + Anthropic pricing table |
 
-### `before-you-build`
+### Common flags
 
-Scores your brief's readiness to start building. Detects scope gaps, undefined roles, and missing context that will cause expensive rework.
-
-```
-costpassport before-you-build [options]
-```
-
-Same flags as `estimate`.
-
-### `token-doctor`
-
-Diagnoses token bloat risk from your brief and project structure. Outputs a context diet and optimization plan.
-
-```
-costpassport token-doctor [options]
-```
-
-| Flag | Description |
-|---|---|
-| `--path <dir>` | Path to project directory (reads CLAUDE.md, README, package.json — no source files) |
-| + all `estimate` flags | |
-
-### `savings-report`
-
-Quantifies savings potential and ranks optimization levers by impact.
-
-```
-costpassport savings-report [options]
-```
-
-Same flags as `token-doctor`.
+| Flag | Commands | Description |
+|---|---|---|
+| `--brief <file>` | all | Path to project brief file |
+| `--live` | passport, estimate, savings-report | Fetch current FX rates from ECB before calculating |
+| `--sources` | passport, estimate, savings-report | Show data origin, FX rates and cache freshness |
+| `--format json\|markdown` | most commands | Output format (default: json or markdown depending on command) |
+| `--output <file>` | passport | Write report to file instead of stdout |
+| `--path <dir>` | token-doctor, savings-report | Scan project directory structure |
+| `--payments` | all | Project includes payments integration |
+| `--mobile` | all | Project includes a mobile app |
+| `--ai` | all | Project includes AI/LLM features |
+| `--realtime` | all | Project includes real-time features |
+| `--i18n` | all | Project includes multi-language support |
+| `--legacy` | all | Project involves a legacy codebase |
+| `--refactor` | all | Refactoring over greenfield |
 
 ---
 
-## Example Reports
+## Live sources and local cache
 
-### Estimate — passport format
+CostPassport uses verifiable data for pricing and FX rates.
+
+**`--live`** fetches current EUR/USD rates from the European Central Bank (ECB) before calculating. Only the ECB exchange rate XML is fetched — no project data is sent anywhere.
+
+**`pricing:update`** writes a local cache to `~/.costpassport/cache.json`. On the next run, CostPassport reads this cache instead of using bundled defaults.
+
+**`--sources`** adds a data provenance block to the report:
 
 ```
-╔══════════════════════════════════════════════════╗
-║      AI BUILD COST PASSPORT — v0.1.0             ║
-╚══════════════════════════════════════════════════╝
-
-PROJECT PROFILE
-  Type         : marketplace
-  Complexity   : Heavy
-  Confidence   : medium
-
-COST ESTIMATE (Economy Scenario — Sonnet 4.6)
-  Tokens       : 420K – 780K
-  USD          : $1.26 – $2.34
-  EUR          : €1.16 – €2.15
-  XOF          : 760 – 1,410 XOF
-
-COST READINESS SCORE
-  Score        : 55 / 100
-  Status       : Needs attention
-  Risk Level   : Medium
+Sources & Data Freshness
+  Data origin:       live_fetch
+  Data freshness:    fresh
+  Pricing source:    https://platform.claude.com/docs/en/about-claude/pricing
+  FX source:         ECB eurofxref
+  EUR/USD:           1.1628
+  EUR/XOF:           655.957  (BCEAO fixed peg)
 ```
 
-### token-doctor — Markdown
-
-```markdown
-## Token Doctor Report
-
-**Token Bloat Risk: High**
-
-### Main Token Leaks
-1. Payments mentioned without flow — payment rework is the most expensive iteration type
-2. Real-time mentioned without architecture — implementation rework doubles token cost
-3. No .claudeignore — AI agent may send dist, logs, and node_modules as context
-
-### Estimated Savings Potential
-40 – 55%
-```
+If the network or cache is unavailable, CostPassport falls back silently to bundled rates — it never crashes.
 
 ---
 
-## Privacy
+## Privacy — local-first
 
-CostPassport runs 100% locally.
+CostPassport is designed to run entirely on your machine.
 
-- No API calls
-- No telemetry
-- No account
-- No data collection
-
-Your brief, your code, your costs — stay on your machine.
+- Your brief stays local — never uploaded, never logged.
+- Your project files stay local — `token-doctor --path` reads only `CLAUDE.md`, `README.md`, `package.json` and directory names. No source code is read.
+- No telemetry. No account. No backend.
+- The only network call is the ECB FX rate fetch when you explicitly use `--live` or `pricing:update`.
 
 ---
 
-## Pricing Disclaimer
+## Who it is for
 
-Token prices in `src/resources/pricing.anthropic.json` reflect Anthropic's published rates as of May 2026. Verify against the [Anthropic pricing page](https://www.anthropic.com/pricing) before making budget decisions.
+- **Freelancers** quoting AI-assisted work for clients
+- **Agencies** managing AI-assisted projects and needing cost guardrails
+- **AI builders** who use Claude Code, Cursor, Codex CLI or any AI coding workflow
+- **Developers** who want a scope and cost check before starting a new project
+- **Teams** who want consistent pre-execution reports across projects
 
-Exchange rates use a static USD/EUR value. XOF uses the fixed CFA peg: 1 EUR = 655.957 XOF.
+---
+
+## What CostPassport is not
+
+- **Not a billing system** — it does not connect to your Claude, Cursor or OpenAI account.
+- **Not a cost guarantee** — estimates are heuristic and may vary ±30–50% from actual usage.
+- **Not a replacement for human review** — use it as a pre-execution checklist, not a contract.
+- **Not a project management system** — it reports risk and cost, not tasks or timelines.
 
 ---
 
 ## Roadmap
 
-- [ ] OpenAI + Gemini provider support
-- [ ] Per-phase token budget allocation
-- [ ] Claude Code plugin (J7 wrapper)
-- [ ] CLAUDE.md generator from brief
-- [ ] CI integration: fail build if costReadinessScore < threshold
+- Claude Code plugin — run `passport` and `estimate` directly from your AI session
+- Compare estimated vs actual — import usage exports and track delta
+- Client-safe reports — shareable cost summaries for client conversations
+- Team workflows — shared cache and consistent reports across a team
+
+---
+
+## Disclaimer
+
+Prices and exchange rates may be verified, but token volume remains an estimate based on project scope. CostPassport identifies risk and savings opportunities. It does not guarantee final cost, agent behavior or build quality.
+
+Model prices are sourced from official Anthropic documentation. Exchange rates are sourced from the European Central Bank. XOF uses the fixed CFA peg: 1 EUR = 655.957 XOF (BCEAO convention).
 
 ---
 
@@ -225,4 +215,5 @@ MIT — free to use, fork, and extend.
 
 ---
 
-*"Know your AI build cost before you start."*
+*CostPassport — AI project cost planner and work guardrail CLI.*
+*Know your AI build cost before you start.*
