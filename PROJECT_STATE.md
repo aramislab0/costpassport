@@ -1,8 +1,8 @@
 # CostPassport — Project State
-**Phase:** v0.3.0 — Published ✅
-**Last update:** 2026-05-11
-**Version local:** 0.3.0
-**Version npm:** 0.3.0 ✅
+**Phase:** v0.4.0 — Published ✅
+**Last update:** 2026-05-15
+**Version local:** 0.4.0
+**Version npm:** 0.4.0 ✅
 
 ## Done
 
@@ -88,10 +88,16 @@
 - Tests: 42/42 ✅
 - Security grep: clean ✅
 
-## Next — v0.4.0
-- OpenAI / Gemini provider support (provider abstraction)
-- `--provider` flag on estimate
-- Claude Code plugin (MCP wrapper, command palette integration)
+## Published
+- [x] Git commit 53a8fea ✅
+- [x] Git tag v0.4.0 ✅
+- [x] npm publish v0.4.0 ✅ — `npm view costpassport version` = 0.4.0
+- [x] `npx costpassport passport --brief marketplace.md` — v0.4.0 ✅
+
+## Next — v0.5.0
+- `costpassport usage:import` — parses Claude Code / Cursor / Anthropic console exports
+- `costpassport compare` — estimated vs actual delta + probable cause
+- Local history in `~/.costpassport/history/`
 
 ## Risks
 - Anthropic pricing table: hardcoded in pricing-update.ts — must be updated manually when prices change
