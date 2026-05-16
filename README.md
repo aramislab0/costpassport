@@ -4,12 +4,28 @@
 
 Estimate cost, check readiness and generate an AI Work Passport before launching AI-assisted work.
 
-```bash
-npx costpassport@latest passport --brief brief.md --live --sources
-```
-
 [![npm version](https://img.shields.io/npm/v/costpassport.svg)](https://www.npmjs.com/package/costpassport)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+```
+─────────────────────────────────────────
+  AI WORK PASSPORT
+─────────────────────────────────────────
+  Readiness    40 / 100 — Not ready yet
+  Overall Risk High
+  Scope Risk   High
+  Est. Cost    $21.6 – $57.6 · €18.58 – €49.54 · ¥3,425 – ¥9,132
+─────────────────────────────────────────
+  Verdict      Do not start the full build yet
+  Top Fix      No MVP boundary — agent may implement all
+─────────────────────────────────────────
+  costpassport · npx costpassport@latest
+─────────────────────────────────────────
+```
+
+```bash
+npx costpassport@latest demo --compact
+```
 
 ---
 
