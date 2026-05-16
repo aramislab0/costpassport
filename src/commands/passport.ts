@@ -7,11 +7,11 @@
  * Flags: --live (ECB FX), --sources (data provenance), --output (write to file).
  */
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import type { Command } from "commander";
 import { passport } from "../engines/passport.js";
 import { runPricingUpdate } from "../engines/pricing-update.js";
-import { renderPassportReport } from "../templates/passport-report.js";
+import { renderPassportReport, renderPassportCompact } from "../templates/passport-report.js";
 import { getSourceMetadata } from "../lib/source-metadata.js";
 import { resolveCurrencies } from "../lib/currencies.js";
 import { resolveCostData } from "../data/resolver.js";
@@ -45,6 +45,8 @@ export function registerPassportCommand(program: Command): void {
     .option("--currency <code>", "Add a currency to the default output (e.g. XOF, GBP)")
     .option("--currencies <codes>", "Show only specific currencies (e.g. USD,EUR,XOF)")
     .option("--all-currencies", "Show all supported currencies", false)
+    .option("--compact", "Output a compact screenshotable AI Work Passport", false)
+    .option("--share", "Write compact passport to .costpassport/AI_WORK_PASSPORT.md", false)
     .action(async (opts: {
       brief?: string;
       format: string;
@@ -62,6 +64,8 @@ export function registerPassportCommand(program: Command): void {
       currency?: string;
       currencies?: string;
       allCurrencies: boolean;
+      compact: boolean;
+      share: boolean;
     }) => {
       let text: string;
 
@@ -131,12 +135,43 @@ export function registerPassportCommand(program: Command): void {
         } else {
           output = JSON.stringify(result, null, 2);
         }
+      } else if (opts.compact) {
+        output = renderPassportCompact(result, selectedCurrencies, usdToEur, ecbRates);
       } else {
         // markdown (default)
         const sourceMeta = opts.sources ? getSourceMetadata(liveResult) : undefined;
         output = renderPassportReport(result, selectedCurrencies, usdToEur, ecbRates, sourceMeta);
       }
 
+      // --share: write .costpassport/AI_WORK_PASSPORT.md
+      if (opts.share && opts.format !== "json") {
+        const shareDir = ".costpassport";
+        const sharePath = `${shareDir}/AI_WORK_PASSPORT.md`;
+        const compactContent = renderPassportCompact(result, selectedCurrencies, usdToEur, ecbRates);
+        const shareContent = [
+          "# AI Work Passport",
+          "",
+          "```",
+          compactContent,
+          "```",
+          "",
+          `Generated: ${result.meta.generated_at}`,
+          `CostPassport v${result.meta.costpassport_version}`,
+          "",
+          "Reproduce:",
+          "```bash",
+          "npx costpassport@latest passport --brief brief.md --compact",
+          "```",
+          "",
+          "_This estimate may vary ±30–50% from actual AI token cost. No project data was shared._",
+        ].join("\n");
+
+        mkdirSync(shareDir, { recursive: true });
+        writeFileSync(sharePath, shareContent + "\n", "utf8");
+        process.stderr.write(`[costpassport] Passport saved to ${sharePath}\n`);
+      }
+
+      // --output: write to file (takes priority over --share for main output)
       if (opts.output) {
         writeFileSync(opts.output, output + "\n", "utf8");
         process.stderr.write(`[costpassport] Passport saved to ${opts.output}\n`);
