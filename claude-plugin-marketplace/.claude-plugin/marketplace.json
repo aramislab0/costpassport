@@ -1,0 +1,17 @@
+{
+  "name": "costpassport-marketplace",
+  "owner": {
+    "name": "Aramis Assane",
+    "email": "aramislab0@gmail.com"
+  },
+  "metadata": {
+    "description": "CostPassport — AI project cost estimation and readiness CLI plugin for Claude Code",
+    "version": "0.4.1"
+  },
+  "plugins": [
+    {
+      "name": "costpassport",
+      "path": "../claude-plugin"
+    }
+  ]
+}
