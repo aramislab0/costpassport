@@ -266,11 +266,16 @@ export function renderPassportCompact(
 
   // Verdict: first sentence of buildDecision
   const verdict = report.readiness.buildDecision.split(".")[0].trim();
-  // Top fix: first priority action, shortened
-  const topFix = (report.priorityActions[0] ?? report.mainTokenLeaks[0] ?? "Review project brief").slice(0, 45);
+  // Top fix: first priority action, truncated at word boundary
+  const rawFix = report.priorityActions[0] ?? report.mainTokenLeaks[0] ?? "Review project brief";
+  const maxFixLen = 44;
+  const topFix = rawFix.length <= maxFixLen
+    ? rawFix
+    : rawFix.slice(0, maxFixLen).replace(/\s\S*$/, "") + "…";
 
+  // label pad: 13 chars to accommodate "Overall Risk " (12) + 1 space
   function row(label: string, value: string): string {
-    const labelPad = label.padEnd(11);
+    const labelPad = label.padEnd(13);
     return `  ${labelPad}${value}`;
   }
 
