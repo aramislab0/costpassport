@@ -27,7 +27,9 @@ npx costpassport --help
 | `savings-report` | Calculate potential cost savings |
 | `pricing:update` | Refresh local FX + pricing cache from ECB |
 | `optimize` | CTOP free preview — token optimization analysis |
-| `passport` | AI Work Passport — unified cost + risk report *(new in v0.4.0)* |
+| `passport` | AI Work Passport — unified cost + risk report *(v0.4.0)* |
+| `demo` | Instant AI Work Passport demo — no brief required *(Distribution Pack)* |
+| `badge` | Generate a shields.io badge for GitHub README *(Distribution Pack)* |
 
 ---
 
@@ -51,6 +53,7 @@ npx costpassport --help
 - **v0.3.x** — Automated test suite (42 tests), `optimize` free preview
 - **v0.4.0** — AI Work Passport: `costpassport passport`
 - **v0.4.0 (post-publish)** — Multi-currency: 16 currencies, USD/EUR/JPY default, `--currency`/`--currencies`/`--all-currencies` flags
+- **Distribution Pack (post-v0.4.1)** — `demo`, `badge`, `passport --compact`, `passport --share`, Claude Code plugin + local marketplace
 
 ---
 

@@ -1,5 +1,12 @@
 # Architecture Decisions
 
+## D-032 · Distribution pack before product depth — 2026-05-15
+CostPassport needs shareable artifacts and a natural adoption channel before new product depth.
+demo, --compact, --share, badge and the Claude Code plugin serve distribution without exposing Pro logic.
+Commands/ markdown files (not skills/) chosen for plugin wrappers: simpler, more predictable, no SKILL.md overhead for wrappers that just call npx.
+Marketplace uses a local .claude-plugin/marketplace.json sibling folder to claude-plugin/.
+Both plugin folders excluded from npm tarball via package.json files allowlist.
+
 ## D-031 · Multi-currency support — 2026-05-15
 Default currencies changed from USD/EUR/XOF to USD/EUR/JPY (BIS top-traded currencies).
 XOF stays supported but is no longer shown by default — available via `--currency XOF`.

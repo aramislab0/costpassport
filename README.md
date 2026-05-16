@@ -107,15 +107,51 @@ Pro features (not included in public CLI):
 
 ---
 
+## Try the demo
+
+No brief required:
+
+```bash
+npx costpassport@latest demo
+npx costpassport@latest demo --compact
+```
+
+## Share your AI Work Passport
+
+```bash
+# Compact screenshotable format
+npx costpassport@latest passport --brief brief.md --compact
+
+# Save to .costpassport/AI_WORK_PASSPORT.md
+npx costpassport@latest passport --brief brief.md --share
+
+# Generate a GitHub badge
+npx costpassport@latest badge --brief brief.md
+```
+
+## Claude Code plugin
+
+```bash
+# Install from local marketplace
+/plugin marketplace add ./claude-plugin-marketplace
+/plugin install costpassport@costpassport-marketplace
+```
+
+Commands available: `/costpassport:passport`, `/costpassport:demo`, `/costpassport:estimate`, `/costpassport:doctor`, `/costpassport:savings`
+
+---
+
 ## Commands
 
 | Command | What it does |
 |---|---|
 | `passport` | Full AI Work Passport — cost, readiness, risks, actions in one report |
+| `demo` | Instant AI Work Passport demo (no brief required) |
 | `estimate` | Token + cost range across Economy / Standard / Premium scenarios |
 | `before-you-build` | Readiness score, fuzzy point detection, suggested build strategy |
 | `token-doctor` | Token leak diagnosis, context diet, optimization plan |
 | `savings-report` | Savings potential and ranked optimization levers |
+| `badge` | Generate a shields.io badge for your GitHub README |
 | `pricing:update` | Refresh local FX rates from ECB + Anthropic pricing table |
 
 ### Common flags

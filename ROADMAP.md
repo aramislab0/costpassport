@@ -66,18 +66,21 @@
 - Flags: `--currency <code>`, `--currencies <codes>`, `--all-currencies`
 - ECB rates bundled for all 15 major currencies; refreshed with `--live`
 
-## v0.5.0 — Plugin Claude Code
-- Skill `/costpassport:preflight` — analyzes brief before build, checks budget, lists risks
-- Skill `/costpassport:doctor` — quick diagnosis in session
-- Skill `/costpassport:savings` — savings report in session
-- Built on existing engines, no duplication
+## Distribution Pack (post-v0.4.1 — no version bump) ✅ Done
+- `costpassport demo` — instant AI Work Passport without a brief file
+- `costpassport passport --compact` — screenshotable single-screen output
+- `costpassport passport --share` — saves .costpassport/AI_WORK_PASSPORT.md
+- `costpassport badge` — shields.io badge for GitHub README (readiness + cost styles)
+- Claude Code plugin: 5 command wrappers (passport, demo, estimate, doctor, savings)
+- Local marketplace: claude-plugin-marketplace/ for /plugin marketplace add
+- Both plugin folders excluded from npm tarball (package.json files allowlist)
 
-## v0.6.0 — compare: estimated vs actual
+## v0.5.0 — compare: estimated vs actual
 - `costpassport usage:import` — parses Claude Code / Cursor / Anthropic console exports
 - `costpassport compare` — estimated vs actual delta + probable cause
 - Local history in `~/.costpassport/history/`
 
-## v0.7.0 — budget-guard
+## v0.6.0 — budget-guard
 - `costpassport budget-guard --brief brief.md --max-usd 100`
 - within budget / over budget decision
 - Scope reduction recommendations if over budget
