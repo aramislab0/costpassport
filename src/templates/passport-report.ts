@@ -231,3 +231,64 @@ export function renderPassportReport(
 
   return lines.join("\n");
 }
+
+// ─── Compact renderer ─────────────────────────────────────────────────────────
+
+export function renderPassportCompact(
+  report: PassportReport,
+  selectedCurrencies: readonly CurrencyCode[] = DEFAULT_CURRENCIES,
+  usdToEur = 0.92,
+  ecbRates: Record<string, number> = {},
+): string {
+  const W = 41; // total width between the outer dashes
+  const bar = "─".repeat(W);
+
+  // Cost: show first 2–3 currencies only (compact width)
+  const displayCurrencies = selectedCurrencies.length > 3
+    ? [...selectedCurrencies.slice(0, 3)]
+    : [...selectedCurrencies];
+
+  const stdUsd = report.cost.standard.usd;
+  const costParts: string[] = [];
+  for (const cur of displayCurrencies) {
+    let low: number, high: number;
+    if (cur === "USD") { low = stdUsd.low; high = stdUsd.high; }
+    else if (cur === "EUR") { low = report.cost.standard.eur.low; high = report.cost.standard.eur.high; }
+    else if (cur === "XOF") { low = report.cost.standard.xof.low; high = report.cost.standard.xof.high; }
+    else {
+      low = convertUsd(stdUsd.low, cur, usdToEur, ecbRates);
+      high = convertUsd(stdUsd.high, cur, usdToEur, ecbRates);
+    }
+    costParts.push(`${formatCurrencyAmount(low, cur)} – ${formatCurrencyAmount(high, cur)}`);
+  }
+  const moreCurrencies = selectedCurrencies.length > 3 ? ` (+${selectedCurrencies.length - 3} more)` : "";
+  const costStr = costParts.join(" · ") + moreCurrencies;
+
+  // Verdict: first sentence of buildDecision
+  const verdict = report.readiness.buildDecision.split(".")[0].trim();
+  // Top fix: first priority action, shortened
+  const topFix = (report.priorityActions[0] ?? report.mainTokenLeaks[0] ?? "Review project brief").slice(0, 45);
+
+  function row(label: string, value: string): string {
+    const labelPad = label.padEnd(11);
+    return `  ${labelPad}${value}`;
+  }
+
+  const lines: string[] = [
+    bar,
+    "  AI WORK PASSPORT",
+    bar,
+    row("Readiness", `${report.readiness.score} / 100 — ${report.readiness.decision}`),
+    row("Overall Risk", report.risks.overallRisk),
+    row("Scope Risk", report.risks.scopeRisk),
+    row("Est. Cost", costStr),
+    bar,
+    row("Verdict", verdict),
+    row("Top Fix", topFix),
+    bar,
+    "  costpassport · npx costpassport@latest",
+    bar,
+  ];
+
+  return lines.join("\n");
+}
