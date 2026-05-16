@@ -17,7 +17,7 @@ import type {
 } from "../types.js";
 import tiersRaw from "../resources/complexity-tiers.json" with { type: "json" };
 
-const VERSION = "0.4.1";
+const VERSION = "0.4.2";
 
 const TIERS_CONFIG = tiersRaw as unknown as {
   tiers: Record<ComplexityTier, Range>;

@@ -12,7 +12,7 @@ import type {
   SavingsReport,
 } from "../types.js";
 
-const VERSION = "0.4.1";
+const VERSION = "0.4.2";
 
 // ─── Savings % from score ─────────────────────────────────────────────────────
 

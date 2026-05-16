@@ -1,6 +1,6 @@
 {
   "name": "costpassport",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "AI Project Cost Planner. Know your AI build cost before you start.",
   "type": "module",
   "bin": {

@@ -311,7 +311,7 @@ describe("Readiness — decision logic", () => {
 
   it("meta contains costpassport_version and generated_at", () => {
     const report = readiness({ text: "Build an app", flags: {} });
-    expect(report.meta.costpassport_version).toBe("0.4.1");
+    expect(report.meta.costpassport_version).toBe("0.4.2");
     expect(typeof report.meta.generated_at).toBe("string");
   });
 });

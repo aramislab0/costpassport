@@ -11,7 +11,7 @@ import type {
   TokenDoctorReport,
 } from "../types.js";
 
-const VERSION = "0.4.1";
+const VERSION = "0.4.2";
 
 // ─── Token leaks ──────────────────────────────────────────────────────────────
 

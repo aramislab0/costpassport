@@ -266,8 +266,27 @@ export function renderPassportCompact(
 
   // Verdict: first sentence of buildDecision
   const verdict = report.readiness.buildDecision.split(".")[0].trim();
-  // Top fix: first priority action, truncated at word boundary
-  const rawFix = report.priorityActions[0] ?? report.mainTokenLeaks[0] ?? "Review project brief";
+
+  // Top fix: prefer business-readable scope/decision issues over technical optimizations.
+  // Scan priorityActions + mainTokenLeaks for keywords a client or freelancer understands.
+  // Fall back to first priority action if nothing business-specific is found.
+  const BUSINESS_KEYWORDS = /payment|mvp|scope|role|auth|user|clarif|split|define|decision|accept|out.of.scope|boundary|who|what|when/i;
+  const TECHNICAL_KEYWORDS = /prompt.cach|model.rout|haiku|sonnet|opus|token|context.compress|context.prun/i;
+
+  const allFixCandidates = [
+    ...report.mainTokenLeaks,
+    ...report.priorityActions,
+  ];
+
+  // 1. First business-readable item
+  const businessFix = allFixCandidates.find(
+    s => BUSINESS_KEYWORDS.test(s) && !TECHNICAL_KEYWORDS.test(s),
+  );
+  // 2. First item that is not purely technical
+  const nonTechnicalFix = allFixCandidates.find(s => !TECHNICAL_KEYWORDS.test(s));
+  // 3. Fallback: first priority action as-is
+  const rawFix = businessFix ?? nonTechnicalFix ?? report.priorityActions[0] ?? "Review project brief";
+
   const maxFixLen = 44;
   const topFix = rawFix.length <= maxFixLen
     ? rawFix
