@@ -1,6 +1,6 @@
 {
   "name": "costpassport",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "AI Work Passport — estimate, scope and control AI-assisted projects before execution",
   "commands": "commands"
 }
