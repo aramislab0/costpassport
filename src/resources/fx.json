@@ -1,26 +1,26 @@
 {
   "base": "USD",
   "rates": {
-    "EUR": 0.92,
+    "EUR": 0.8745,
     "XOF_PER_EUR": 655.957
   },
   "ecbRates": {
-    "USD": 1.0870,
-    "JPY": 164.00,
-    "GBP": 0.8448,
-    "CNY": 7.8000,
-    "AUD": 1.6500,
-    "CAD": 1.4700,
-    "CHF": 0.9400,
-    "HKD": 8.4700,
-    "SGD": 1.4400,
-    "SEK": 11.1000,
-    "KRW": 1530.00,
-    "NOK": 11.7000,
-    "NZD": 1.7900,
-    "MXN": 20.5000
+    "USD": 1.1435,
+    "JPY": 185.72,
+    "GBP": 0.85363,
+    "CNY": 7.7712,
+    "AUD": 1.6478,
+    "CAD": 1.6202,
+    "CHF": 0.9227,
+    "HKD": 8.9605,
+    "SGD": 1.4784,
+    "SEK": 11.062,
+    "KRW": 1729.49,
+    "NOK": 11.1305,
+    "NZD": 1.9916,
+    "MXN": 20.0686
   },
-  "last_updated": "2026-05-15",
+  "last_updated": "2026-07-09",
   "mode": "static",
   "warning": "Bundled fallback rates. Run `costpassport pricing:update` to refresh from ECB.",
   "usd_eur_note": "Update rates.EUR periodically. ecbRates are EUR_TO_XXX from ECB eurofxref."
