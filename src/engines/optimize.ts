@@ -7,7 +7,7 @@
  * Advanced optimization features are planned for a future Pro version.
  */
 
-const VERSION = "0.4.2";
+const VERSION = "0.4.3";
 
 import type {
   BriefFlags,

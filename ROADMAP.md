@@ -75,6 +75,16 @@
 - Local marketplace: claude-plugin-marketplace/ for /plugin marketplace add
 - Both plugin folders excluded from npm tarball (package.json files allowlist)
 
+## v0.4.3 — Pre-launch data refresh ✅ Ready (pending publish confirmation)
+- Pricing verified against official page (2026-05-20): added Sonnet 5, Opus 4.8
+- Kept Sonnet 4.6, Opus 4.6, Opus 4.7, Haiku 4.5 (still billable)
+- Sonnet 5 uses standard (post-intro) rate $3/$15 — conservative policy (D-033)
+- scenario_model_mix updated: default Sonnet 5, premium adds Opus 4.8 (standard, not fast mode)
+- FX bundled rates refreshed from ECB (2026-07-09)
+- User-facing copy de-versioned (D-034)
+- USD estimates unchanged vs v0.4.2 (Sonnet 5 std = Sonnet 4.6, Opus 4.8 = Opus 4.6 in price)
+- No new features, no new commands
+
 ## v0.5.0 — compare: estimated vs actual
 - `costpassport usage:import` — parses Claude Code / Cursor / Anthropic console exports
 - `costpassport compare` — estimated vs actual delta + probable cause

@@ -17,7 +17,7 @@ import type {
 } from "../types.js";
 import tiersRaw from "../resources/complexity-tiers.json" with { type: "json" };
 
-const VERSION = "0.4.2";
+const VERSION = "0.4.3";
 
 const TIERS_CONFIG = tiersRaw as unknown as {
   tiers: Record<ComplexityTier, Range>;
@@ -135,7 +135,7 @@ function topCostDrivers(flags: BriefFlags, type: ProjectType): string[] {
 
 function optimizationHints(flags: BriefFlags): string[] {
   const hints: string[] = [
-    "Use Sonnet 4.6 by default; reserve Opus only for architecture decisions",
+    "Use the default Sonnet model; reserve Opus only for architecture decisions",
     "Keep CLAUDE.md under 80 lines; move repeated instructions to skills",
     "Enable prompt caching for stable system context (saves up to 90% on repeated inputs)",
   ];
@@ -174,7 +174,7 @@ function assessConfidence(text: string, flags: BriefFlags): { confidence: Confid
 function buildAssumptions(flags: BriefFlags): string[] {
   const assumptions: string[] = [];
   if (!flags.refactor && !flags.legacy) assumptions.push("Greenfield project (no existing codebase)");
-  assumptions.push("Sonnet 4.6 as default model");
+  assumptions.push("Standard Sonnet model as default");
   assumptions.push("Solo developer or small team using an AI coding agent");
   assumptions.push("Default prompt caching available for repeated context");
   if (!flags.stack) assumptions.push("Mainstream stack assumed (Next.js + Supabase or equivalent)");

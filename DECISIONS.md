@@ -1,5 +1,21 @@
 # Architecture Decisions
 
+## D-034 · No model version numbers in user-facing copy — 2026-05-20
+Recommendation texts (optimizationHints, doctor advanced actions, assumptions, scenario descriptions)
+use generic wording ("the default Sonnet model", "standard Sonnet model") instead of versioned names,
+to prevent silent staleness when default models change.
+Versioned keys remain in pricing/complexity JSON — that is data, not recommendation copy.
+Applied in: engines/estimate.ts, engines/doctor.ts, engines/savings.ts, templates/passport.ts.
+
+## D-033 · Conservative pricing policy for time-limited rates — 2026-05-20
+When a model has introductory pricing, CostPassport uses the standard (post-intro) rate for estimates
+and documents the intro rate in pricing_notes.
+Rationale: a FinOps tool must never silently under-estimate future costs. An estimate made with
+Sonnet 5 intro pricing ($2/$10) would become wrong on 2026-09-01 when standard pricing ($3/$15) applies.
+Better to over-estimate by ~30% for a few weeks than under-estimate silently afterward.
+Applied to: sonnet-5 uses $3/$15 (standard) in pricing.anthropic.json and pricing-update.ts.
+Official page verified 2026-05-20: https://platform.claude.com/docs/en/about-claude/pricing
+
 ## D-032 · Distribution pack before product depth — 2026-05-15
 CostPassport needs shareable artifacts and a natural adoption channel before new product depth.
 demo, --compact, --share, badge and the Claude Code plugin serve distribution without exposing Pro logic.

@@ -11,7 +11,7 @@ import type {
   TokenDoctorReport,
 } from "../types.js";
 
-const VERSION = "0.4.2";
+const VERSION = "0.4.3";
 
 // ─── Token leaks ──────────────────────────────────────────────────────────────
 
@@ -222,7 +222,7 @@ function buildOptimizationPlan(flags: BriefFlags, signals: ProjectSignals | null
 
   // Advanced
   advanced.push("Enable prompt caching for stable system context — saves up to 90% on repeated inputs");
-  advanced.push("Default to Sonnet 4.6; reserve Opus only for architecture decisions (max 3 per project)");
+  advanced.push("Default to the standard Sonnet model; reserve Opus only for architecture decisions (max 3 per project)");
   advanced.push("Use Claude Code skills to scope sessions: one skill per domain, not one session for all");
   if (flags.ai)
     advanced.push("Run AI feature development in isolation with a dedicated context window");
@@ -262,7 +262,7 @@ function buildAssumptions(text: string, signals: ProjectSignals | null, flags: B
   if (text.length === 0) a.push("No brief provided — analysis based on project structure only");
   if (!flags.stack) a.push("Tech stack inferred from brief or project scan");
   if (signals !== null) a.push(`Project scanned at path level only — source files not read`);
-  a.push("Sonnet 4.6 as default model");
+  a.push("Standard Sonnet model as default");
   a.push("Solo developer or small team using an AI coding agent");
   return a;
 }

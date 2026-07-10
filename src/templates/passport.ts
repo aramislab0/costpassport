@@ -51,7 +51,7 @@ const SCENARIO_LABEL: Record<ScenarioName, string> = {
 
 const SCENARIO_DESC: Record<ScenarioName, string> = {
   economy: "Haiku + Sonnet mix, minimal iterations",
-  standard: "Sonnet 4.6 throughout",
+  standard: "Default Sonnet model throughout",
   premium: "Sonnet + Opus mix, intensive iteration",
 };
 

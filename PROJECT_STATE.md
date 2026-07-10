@@ -1,8 +1,9 @@
 # CostPassport — Project State
 
-**Version:** 0.4.0
-**npm latest:** 0.4.0 ✅
-**Last updated:** 2026-05-15
+**Version:** 0.4.3 (pre-launch data refresh — pending publish confirmation)
+**npm latest:** 0.4.2 ✅
+**Last updated:** 2026-05-20
+**Phase:** Pre-launch data refresh
 
 ---
 
@@ -54,6 +55,7 @@ npx costpassport --help
 - **v0.4.0** — AI Work Passport: `costpassport passport`
 - **v0.4.0 (post-publish)** — Multi-currency: 16 currencies, USD/EUR/JPY default, `--currency`/`--currencies`/`--all-currencies` flags
 - **Distribution Pack (post-v0.4.1)** — `demo`, `badge`, `passport --compact`, `passport --share`, Claude Code plugin + local marketplace
+- **v0.4.3** — Pre-launch data refresh: pricing verified (Sonnet 5, Opus 4.8 added), FX refreshed from ECB, user-facing copy de-versioned. No new features.
 
 ---
 

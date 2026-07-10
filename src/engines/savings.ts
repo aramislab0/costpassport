@@ -12,7 +12,7 @@ import type {
   SavingsReport,
 } from "../types.js";
 
-const VERSION = "0.4.2";
+const VERSION = "0.4.3";
 
 // ─── Savings % from score ─────────────────────────────────────────────────────
 
@@ -178,7 +178,7 @@ export function savingsReport({
       "The tighter and more explicit your brief, the smaller the buffer needed.",
     recommendedNextAction: recommendedAction(score),
     assumptions: [
-      "Current cost baseline: Standard scenario (Sonnet 4.6, 65% input / 35% output ratio)",
+      "Current cost baseline: Standard scenario (default Sonnet model, 65% input / 35% output ratio)",
       "Optimized cost assumes all listed levers are applied",
       "Savings percentages are heuristic — actual savings depend on implementation discipline",
       "FX rates are reference rates (ECB via pricing:update or bundled fallback) — verify before client billing",
