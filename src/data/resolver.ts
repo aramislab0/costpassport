@@ -81,8 +81,10 @@ function isCacheV1(parsed: unknown): parsed is CacheV1 {
 // ─── CacheV1 → PricingTable / FxTable ────────────────────────────────────────
 
 const MODEL_KEY_MAP: Record<string, ModelKey> = {
+  "claude-sonnet-5":   "sonnet-5",
   "claude-sonnet-4-6": "sonnet-4-6",
   "claude-haiku-4-5":  "haiku-4-5",
+  "claude-opus-4-8":   "opus-4-8",
   "claude-opus-4-7":   "opus-4-7",
   "claude-opus-4-6":   "opus-4-6",
 };

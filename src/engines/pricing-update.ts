@@ -23,13 +23,23 @@ const ECB_TIMEOUT_MS = 10_000;
 
 // ─── Anthropic pricing table ──────────────────────────────────────────────────
 // Source: https://platform.claude.com/docs/en/about-claude/pricing
-// Verified: 2026-05-11
+// Verified: 2026-05-20
 // Update this table and ANTHROPIC_PRICING_VERIFIED_AT on each price change.
+// Sonnet 5 uses the standard (post-intro) rate — see D-033.
 
-const ANTHROPIC_PRICING_VERIFIED_AT = "2026-05-11";
+const ANTHROPIC_PRICING_VERIFIED_AT = "2026-05-20";
 const ANTHROPIC_SOURCE_URL = "https://platform.claude.com/docs/en/about-claude/pricing";
 
 const ANTHROPIC_MODELS = {
+  "claude-sonnet-5": {
+    input_price_per_million: 3,
+    output_price_per_million: 15,
+    cache_write_5m_price_per_million: 3.75,
+    cache_write_1h_price_per_million: 6,
+    cache_read_price_per_million: 0.30,
+    source_url: ANTHROPIC_SOURCE_URL,
+    verified_at: ANTHROPIC_PRICING_VERIFIED_AT,
+  },
   "claude-sonnet-4-6": {
     input_price_per_million: 3,
     output_price_per_million: 15,
@@ -48,6 +58,15 @@ const ANTHROPIC_MODELS = {
     source_url: ANTHROPIC_SOURCE_URL,
     verified_at: ANTHROPIC_PRICING_VERIFIED_AT,
   },
+  "claude-opus-4-8": {
+    input_price_per_million: 5,
+    output_price_per_million: 25,
+    cache_write_5m_price_per_million: 6.25,
+    cache_write_1h_price_per_million: 10,
+    cache_read_price_per_million: 0.50,
+    source_url: ANTHROPIC_SOURCE_URL,
+    verified_at: ANTHROPIC_PRICING_VERIFIED_AT,
+  },
   "claude-opus-4-7": {
     input_price_per_million: 5,
     output_price_per_million: 25,
@@ -57,7 +76,7 @@ const ANTHROPIC_MODELS = {
     source_url: ANTHROPIC_SOURCE_URL,
     verified_at: ANTHROPIC_PRICING_VERIFIED_AT,
   },
-  // Opus 4.6 — same price tier as 4.7
+  // Opus 4.6 — same price tier as 4.7 / 4.8
   "claude-opus-4-6": {
     input_price_per_million: 5,
     output_price_per_million: 25,

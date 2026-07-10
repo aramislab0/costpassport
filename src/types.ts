@@ -14,7 +14,7 @@ export type Confidence = "low" | "medium" | "high";
 
 export type ScenarioName = "economy" | "standard" | "premium";
 
-export type ModelKey = "opus-4-7" | "opus-4-6" | "sonnet-4-6" | "haiku-4-5";
+export type ModelKey = "opus-4-8" | "opus-4-7" | "opus-4-6" | "sonnet-5" | "sonnet-4-6" | "haiku-4-5";
 
 export interface Range {
   low: number;

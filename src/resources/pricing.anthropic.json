@@ -1,11 +1,25 @@
 {
-  "pricing_last_verified": "2026-05-10",
-  "source_note": "Anthropic official pricing page. Verify before commercial use.",
+  "pricing_last_verified": "2026-05-20",
+  "source_note": "https://platform.claude.com/docs/en/about-claude/pricing",
   "batch_discount": 0.5,
-  "opus_4_7_tokenizer_risk": "May use up to 35% more tokens for the same fixed text.",
+  "opus_4_7_tokenizer_risk": "Claude Opus 4.7 and later Opus models, plus Claude Sonnet 5, use a newer tokenizer that produces approximately 30% more tokens for the same text. Sonnet 4.6 and earlier use the previous tokenizer.",
+  "pricing_notes": [
+    "Sonnet 5 introductory pricing of $2/$10 per MTok (input/output) is in effect through 2026-08-31; standard pricing of $3/$15 applies from 2026-09-01. CostPassport uses the standard (post-intro) rate for estimates so figures do not silently under-estimate after the intro window (see D-033).",
+    "Since 2026-06-15, programmatic Claude Code usage on Pro/Max subscriptions draws from API-rate credit pools, so API-rate estimates apply to subscription agentic usage as well.",
+    "Opus 4.8 and Opus 4.7 offer a research-preview fast mode at premium rates ($10/$50 and $30/$150 per MTok); CostPassport estimates use standard Opus pricing, not fast mode. Fast mode is not available with the Batch API.",
+    "Batch API applies a 50% discount on both input and output tokens; cache reads (hits) are billed at 10% of the base input price."
+  ],
   "currency": "USD",
   "unit": "USD per million tokens (MTok)",
   "models": {
+    "opus-4-8": {
+      "label": "Claude Opus 4.8",
+      "input": 5,
+      "output": 25,
+      "cache_write_5m": 6.25,
+      "cache_write_1h": 10,
+      "cache_hit": 0.5
+    },
     "opus-4-7": {
       "label": "Claude Opus 4.7",
       "input": 5,
@@ -21,6 +35,14 @@
       "cache_write_5m": 6.25,
       "cache_write_1h": 10,
       "cache_hit": 0.5
+    },
+    "sonnet-5": {
+      "label": "Claude Sonnet 5",
+      "input": 3,
+      "output": 15,
+      "cache_write_5m": 3.75,
+      "cache_write_1h": 6,
+      "cache_hit": 0.3
     },
     "sonnet-4-6": {
       "label": "Claude Sonnet 4.6",
