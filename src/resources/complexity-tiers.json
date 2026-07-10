@@ -28,8 +28,8 @@
     "premium":  { "input": 0.60, "output": 0.40 }
   },
   "scenario_model_mix": {
-    "economy":  { "sonnet-4-6": 0.8, "haiku-4-5": 0.2 },
-    "standard": { "sonnet-4-6": 1.0 },
-    "premium":  { "sonnet-4-6": 0.7, "opus-4-6": 0.3 }
+    "economy":  { "sonnet-5": 0.8, "haiku-4-5": 0.2 },
+    "standard": { "sonnet-5": 1.0 },
+    "premium":  { "sonnet-5": 0.7, "opus-4-8": 0.3 }
   }
 }
